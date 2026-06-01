@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --cream:        #F5F0E8;
+  --cream-dk:     #EDE7DA;
+  --cream-dkr:    #E4DBCC;
+  --red:          #C4341A;
+  --red-hover:    #A02810;
+  --red-pale:     #F2DDD9;
+  --olive:        #4A5240;
+  --olive-lt:     #6B7560;
+  --olive-pale:   #CDD4C2;
+  --amber:        #C97F18;
+  --amber-lt:     #E8A830;
+  --amber-pale:   #F0E0B0;
+  --charcoal:     #1C1A16;
+  --charcoal-mid: #3D3A34;
+  --warm-gray:    #6B6557;
+  --warm-gray-lt: #9E9688;
+  --border:       #D5CCB8;
+  --border-str:   #B8AC98;
+
+  --fd: 'Cormorant Garamond', Georgia, serif;
+  --fu: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --tx-xs:   0.6875rem;
+  --tx-sm:   0.8125rem;
+  --tx-base: 0.9375rem;
+  --tx-md:   1.0625rem;
+  --tx-lg:   1.25rem;
+  --tx-xl:   1.5625rem;
+  --tx-2xl:  2rem;
+  --tx-3xl:  2.75rem;
+  --tx-4xl:  3.75rem;
+  --tx-5xl:  5.25rem;
+  --tx-6xl:  7.5rem;
+
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;
+  --s8:32px;--s10:40px;--s12:48px;--s16:64px;--s20:80px;--s24:96px;
+
+  --r1:2px;--r2:4px;--r3:8px;--r4:16px;
+
+  --sh-sm:0 1px 3px rgba(28,26,22,.07);
+  --sh:   0 2px 8px rgba(28,26,22,.10);
+  --sh-lg:0 8px 24px rgba(28,26,22,.13);
+  --sh-xl:0 20px 60px rgba(28,26,22,.18);
+
+  --ease:cubic-bezier(.4,0,.2,1);
+  --ease-o:cubic-bezier(0,0,.2,1);
+  --dur:180ms;--dur-s:360ms;
+}
+
+body{background:var(--cream);color:var(--charcoal);font-family:var(--fu);font-size:var(--tx-base);line-height:1.55;-webkit-font-smoothing:antialiased;}
+button{font-family:var(--fu);cursor:pointer;border:none;background:none;}
+input,textarea,select{font-family:var(--fu);font-size:var(--tx-base);}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--cream-dk)}
+::-webkit-scrollbar-thumb{background:var(--border-str);border-radius:3px}
+.no-sb{scrollbar-width:none;}.no-sb::-webkit-scrollbar{display:none;}

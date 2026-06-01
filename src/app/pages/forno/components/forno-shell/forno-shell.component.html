@@ -1,0 +1,86 @@
+<div class="forno-app">
+  <nav class="forno-top-nav">
+    <div class="forno-top-nav__inner">
+      <a class="forno-top-nav__logo" routerLink="/dashboard">
+        Forno <span>&amp;</span> Slice
+      </a>
+
+      <div class="forno-top-nav__links">
+        <a
+          class="forno-top-nav__link"
+          routerLink="/dashboard"
+          [class.forno-top-nav__link--active]="isActive('/dashboard')">
+          Home
+        </a>
+        <a
+          class="forno-top-nav__link"
+          routerLink="/menu"
+          [class.forno-top-nav__link--active]="isActive('/menu')">
+          Menu
+        </a>
+        <a
+          class="forno-top-nav__link"
+          routerLink="/build"
+          [class.forno-top-nav__link--active]="isActive('/build')">
+          Build Your Own
+        </a>
+      </div>
+
+      <div class="forno-top-nav__actions">
+        <a
+          class="forno-top-nav__kitchen"
+          routerLink="/kitchen"
+          [class.forno-top-nav__kitchen--active]="isActive('/kitchen')">
+          KITCHEN
+          <span>↗</span>
+        </a>
+        <a
+          class="forno-top-nav__cart"
+          routerLink="/cart"
+          [class.forno-top-nav__cart--active]="isActive('/cart')">
+          <span class="material-icons">shopping_bag</span>
+          Cart
+        </a>
+        <button type="button" class="forno-top-nav__logout" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="forno-main">
+    <ng-content></ng-content>
+  </main>
+
+  <nav class="forno-bottom-nav" aria-label="Primary tabs">
+    <a
+      class="forno-bottom-nav__tab"
+      routerLink="/dashboard"
+      [class.forno-bottom-nav__tab--active]="isActive('/dashboard')">
+      <span class="material-icons">home</span>
+      Home
+    </a>
+    <a
+      class="forno-bottom-nav__tab"
+      routerLink="/menu"
+      [class.forno-bottom-nav__tab--active]="isActive('/menu')">
+      <span class="material-icons">restaurant_menu</span>
+      Menu
+    </a>
+    <a
+      class="forno-bottom-nav__tab"
+      routerLink="/build"
+      [class.forno-bottom-nav__tab--active]="isActive('/build')">
+      <span class="material-icons">local_pizza</span>
+      Build
+    </a>
+    <a
+      class="forno-bottom-nav__tab"
+      routerLink="/cart"
+      [class.forno-bottom-nav__tab--active]="isActive('/cart')">
+      <span class="material-icons">shopping_bag</span>
+      Cart
+    </a>
+  </nav>
+</div>
+

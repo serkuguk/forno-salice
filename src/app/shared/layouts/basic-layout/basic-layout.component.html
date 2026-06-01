@@ -1,0 +1,72 @@
+<div class="layout-container">
+    <div class="layout">
+        <div class="layout__filter">
+
+            <div class="layout__filter-item"> 
+                <ng-content select="[filter]"></ng-content>
+            </div>
+
+            <div class="layout__filter-item filter-buttons">
+                <app-button 
+                    (click)="clearButtonEvent()" 
+                    [disabled]="false"
+                    [class]="'btn btn-sm bg-gray text-white px-4 mx-0 cursor-hand'"    
+                >Limpiar</app-button>
+            </div>
+
+        </div>
+
+        <div class="layout__table">
+            <div class="layout__table-block">
+                <ng-content select="[table]"></ng-content>
+            </div>
+        </div>
+
+        <div class="layout__formulario">
+            <div class="layout__formulario-buttons-icons">
+                <h6 style="font-size:1em;"
+                    class="editar hand-cursor mb-0 enlace" 
+                    (click)="newButtonEvent()"
+                    [class.no-events-button]="false">
+                    Añadir
+                    <i class="ml-1 fas fa-plus-circle"></i>
+                </h6>
+                <h6 style="font-size:1em;"
+                    class="editar hand-cursor mb-0 enlace" 
+                    (click)="editButtonEvent()"
+                    [class.no-events-button]="!canEdit">
+                    Editar
+                    <i class="ml-1 fas fa-pen"></i>
+                </h6>
+                <h6 style="font-size:1em;" 
+                    class="hand-cursor mb-0 enlace px-0" 
+                    [class.no-events-button]="!canEdit"
+                    (click)="removeButtonEvent()"
+                    placement="bottom-left">
+                    Eliminar
+                    <i class="ml-1 fas fa-trash-alt"></i>
+                </h6>
+            </div>
+            <div class="layout__formulario-forms">
+                <ng-content select="[formulario]"></ng-content>
+            </div>
+        </div>
+
+        <div class="layout__buttons">
+            <ng-container>
+                <app-button 
+                    (click)="cancelButtonEvent()" 
+                    [disabled]="!canSave"
+                    [class]="'btn btn-sm bg-gray text-white px-4 mx-0 cursor-hand'"    
+                >Cancelar</app-button>
+                <app-button
+                    (click)="saveButtonEvent()"
+                    [disabled]="!canSave"
+                    [class]="'btn btn-sm bg-orange ml-2 text-white px-4 mx-0 cursor-hand'"
+                >Guardar</app-button>
+
+                <!--app-messages [msgType]="'info'" [message]="[]" [closable]="false"></!--app-messages-->
+            </ng-container>
+        </div>
+    </div>
+</div>

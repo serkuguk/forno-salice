@@ -1,0 +1,128 @@
+<app-forno-shell>
+  <section class="menu-page">
+    <header class="menu-page__header">
+      <div class="menu-page__container">
+        <div class="menu-page__title-row">
+          <p class="menu-page__eyebrow">Forno &amp; Slice</p>
+          <h1>The Menu</h1>
+        </div>
+        <div class="menu-page__tabs-row">
+          <button
+            type="button"
+            class="menu-tab"
+            [class.menu-tab--active]="activeCategory() === 'all'"
+            (click)="setCategory('all')">
+            Everything
+          </button>
+          <button
+            type="button"
+            class="menu-tab"
+            [class.menu-tab--active]="activeCategory() === 'classics'"
+            (click)="setCategory('classics')">
+            Classics
+          </button>
+          <button
+            type="button"
+            class="menu-tab"
+            [class.menu-tab--active]="activeCategory() === 'signature'"
+            (click)="setCategory('signature')">
+            Signatures
+          </button>
+
+          <a class="menu-page__builder-link" routerLink="/build">
+            Build Your Own <span aria-hidden="true">&#8594;</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="menu-page__container menu-page__content">
+      @if (loading()) {
+        <p class="menu-page__state">Loading menu...</p>
+      }
+
+      @if (error()) {
+        <p class="menu-page__state menu-page__state--error">{{ error() }}</p>
+      }
+
+      @if (!loading() && !error()) {
+        @if (activeCategory() === 'all' && featured(); as featuredItem) {
+          <article class="featured-card">
+            <div class="featured-card__media">
+              @if (featuredItem.imageUrl) {
+                <img [src]="featuredItem.imageUrl" [alt]="featuredItem.title" />
+              } @else {
+                <div class="featured-card__fallback" aria-hidden="true"></div>
+              }
+            </div>
+
+            <div class="featured-card__body">
+              <span class="menu-badge">house fave</span>
+              <h2>{{ featuredItem.title }}</h2>
+              <p>{{ featuredItem.description }}</p>
+              <div class="featured-card__price-row">
+                <strong>{{ featuredItem.priceLabel }}</strong>
+                <small>Neapolitan base<br />Wood-fired 90s</small>
+              </div>
+              <div class="featured-card__actions">
+                <button type="button" class="btn btn--primary" (click)="addToCart(featuredItem)">
+                  {{ addedItemId() === featuredItem.id ? 'Added' : 'Add to cart' }}
+                </button>
+                <a class="btn btn--ghost-inverse" routerLink="/build">Customise</a>
+              </div>
+            </div>
+          </article>
+        }
+
+        <section class="menu-section">
+          <div class="menu-section__head">
+            <h3>{{ sectionTitle() }}</h3>
+            <span>{{ count() }} on the menu</span>
+          </div>
+
+          <div class="menu-grid">
+            @for (item of rest(); track item.id; let i = $index) {
+              <article class="menu-card" [class.menu-card--wide]="i === 0">
+                <div class="menu-card__media">
+                  @if (item.badge) {
+                    <span class="menu-badge">{{ item.badge }}</span>
+                  }
+
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.title" />
+                  } @else {
+                    <div class="menu-card__fallback" aria-hidden="true"></div>
+                  }
+                </div>
+
+                <div class="menu-card__body">
+                  <div class="menu-card__title-row">
+                    <h4>{{ item.title }}</h4>
+                    <strong>{{ item.priceLabel }}</strong>
+                  </div>
+                  <p>{{ item.description }}</p>
+                  <div class="menu-card__actions">
+                    <button type="button" class="btn btn--primary btn--sm" (click)="addToCart(item)">
+                      {{ addedItemId() === item.id ? 'Added' : 'Add to cart' }}
+                    </button>
+                    <a class="btn btn--ghost btn--sm" routerLink="/build">Customise</a>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="menu-cta">
+          <div>
+            <h3>Don't see exactly what you want?</h3>
+            <p>Build your own from EUR 12 - every ingredient a la carte.</p>
+          </div>
+          <a class="btn btn--dark" routerLink="/build">
+            Build Your Own <span aria-hidden="true">&#8594;</span>
+          </a>
+        </section>
+      }
+    </div>
+  </section>
+</app-forno-shell>

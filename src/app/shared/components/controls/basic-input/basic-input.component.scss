@@ -1,0 +1,34 @@
+:host-context(.form-field_error) {
+  input {
+    border: 1px solid #B00020 //$error;
+  }
+}
+
+.app-input {
+  border: 1px solid rgba(7, 14, 39, 0.4);
+  background-color: #f9f9f9;
+  color: #495057;
+  width: 100%;
+
+  &_disabled {
+    background: rgba(0, 0, 0, .05);
+    border: 1px solid rgba(7, 14, 39, .15);
+  }
+}
+
+:host::ng-deep .ui-inputtext {
+  height: 2.1rem;
+  border: 1px solid rgba(206, 212, 218, 1);
+  color: #495057;
+  width: 100%;
+}
+
+:host::ng-deep .ui-inputtext:hover {
+  border: 1px solid rgba(206, 212, 218, 1);
+}
+
+:host::ng-deep .ui-inputtext[disabled] {
+  background: rgba(0, 0, 0, .05);
+  border: 1px solid rgba(0, 0, 0, .18);
+  color: rgba(0, 0, 0, 1);
+}

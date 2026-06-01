@@ -1,0 +1,171 @@
+:host {
+  display: block;
+}
+
+.forno-app {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+.forno-top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border);
+  background: var(--cream);
+  box-shadow: var(--sh-sm);
+}
+
+.forno-top-nav__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--s6);
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s6);
+}
+
+.forno-top-nav__logo {
+  font-family: var(--fd);
+  font-size: var(--tx-2xl);
+  font-weight: 600;
+  color: var(--charcoal);
+  white-space: nowrap;
+
+  span {
+    color: var(--red);
+  }
+}
+
+.forno-top-nav__links {
+  display: flex;
+  gap: var(--s1);
+}
+
+.forno-top-nav__link {
+  font-size: var(--tx-sm);
+  color: var(--warm-gray);
+  border-radius: var(--r2);
+  padding: 7px 14px;
+  transition: all var(--dur) var(--ease);
+}
+
+.forno-top-nav__link--active {
+  color: var(--red);
+  background: var(--red-pale);
+  font-weight: 600;
+}
+
+.forno-top-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.forno-top-nav__kitchen {
+  font-size: var(--tx-xs);
+  letter-spacing: .08em;
+  font-weight: 700;
+  color: var(--warm-gray-lt);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 7px 12px;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.forno-top-nav__kitchen--active {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.forno-top-nav__cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--tx-sm);
+  font-weight: 600;
+  color: var(--cream);
+  background: var(--charcoal);
+  border-radius: var(--r2);
+  padding: 9px 14px;
+}
+
+.forno-top-nav__cart .material-icons {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.forno-top-nav__cart--active {
+  background: var(--red);
+}
+
+.forno-top-nav__logout {
+  font-size: var(--tx-sm);
+  color: var(--warm-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 8px 12px;
+}
+
+.forno-main {
+  min-height: calc(100vh - 60px);
+  padding-bottom: 76px;
+}
+
+.forno-bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--cream);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.forno-bottom-nav__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px 8px;
+  font-size: var(--tx-xs);
+  color: var(--warm-gray);
+  letter-spacing: .04em;
+}
+
+.forno-bottom-nav__tab .material-icons {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.forno-bottom-nav__tab--active {
+  color: var(--red);
+  font-weight: 700;
+}
+
+@media (max-width: 1080px) {
+  .forno-top-nav__inner {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+    padding-top: var(--s3);
+    padding-bottom: var(--s3);
+  }
+
+  .forno-top-nav__links {
+    order: 3;
+    overflow-x: auto;
+  }
+
+  .forno-top-nav__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+

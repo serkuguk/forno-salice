@@ -1,0 +1,30 @@
+:host-context(.form-field_error) {
+  input {
+    border: 1px solid #B00020 !important;
+  }
+}
+
+.app-calendar {
+  height: 2rem;
+  border-radius: 0.2rem;
+  color: #495057;
+  width: 100%;
+
+  input {
+    height: 100%;
+  }
+}
+
+:host .datepicker[disabled] {
+  background: rgb(248, 248, 248, 1);
+  border: 1px solid rgba(0, 0, 0, .15);
+  color: rgba(0, 0, 0, .38);
+}
+
+:host .datepicker[disabled]::placeholder {
+  color: rgba(0, 0, 0, .38);
+}
+
+.form-control {
+  border-color: #ced4da !important;
+}

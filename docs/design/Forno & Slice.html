@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forno &amp; Slice — Wood-fired City Pizza</title>
+  <link rel="stylesheet" href="forno-tokens.css"/>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    #root { min-height: 100vh; }
+    /* Mobile bottom nav padding */
+    @media (max-width: 768px) {
+      .screen-wrap { padding-bottom: 80px; }
+    }
+    /* Mobile responsive overrides */
+    @media (max-width: 768px) {
+      .desktop-only { display: none !important; }
+    }
+    @media (min-width: 769px) {
+      .mobile-only { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<!-- Load order: data → shared components → screens → app -->
+<script type="text/babel" src="forno-data.jsx?v=2"></script>
+<script type="text/babel" src="forno-shared.jsx?v=2"></script>
+<script type="text/babel" src="forno-home.jsx?v=3"></script>
+<script type="text/babel" src="forno-menu.jsx?v=2"></script>
+<script type="text/babel" src="forno-builder.jsx?v=2"></script>
+<script type="text/babel" src="forno-cart.jsx?v=2"></script>
+<script type="text/babel" src="forno-tracking.jsx?v=2"></script>
+<script type="text/babel" src="forno-kitchen.jsx?v=2"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=2"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ── TWEAK DEFAULTS ───────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#C4341A",
+  "headingFont": "Cormorant Garamond",
+  "showKitchenLink": true,
+  "heroStyle": "dark"
+}/*EDITMODE-END*/;
+
+// ── APP ──────────────────────────────────────────────────────────
+const App = () => {
+  const [screen,      setScreen]      = useState('home');
+  const [cart,        setCart]        = useState([]);
+  const [cartOpen,    setCartOpen]    = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [tweaks,      setTweaks]      = useState(TWEAK_DEFAULTS);
+  const [tweakOpen,   setTweakOpen]   = useState(false);
+
+  // Persist cart
+  useEffect(() => {
+    try { const c = localStorage.getItem('fs-cart'); if(c) setCart(JSON.parse(c)); } catch{}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem('fs-cart', JSON.stringify(cart)); } catch{}
+  }, [cart]);
+
+  // Scroll to top on screen change
+  useEffect(() => { window.scrollTo(0, 0); }, [screen]);
+
+  // Apply accent color tweak
+  useEffect(() => {
+    document.documentElement.style.setProperty('--red', tweaks.accentColor);
+    const hsl = tweaks.accentColor; // simplified
+  }, [tweaks.accentColor]);
+
+  // Cart helpers
+  const addToCart = (item) => setCart(prev => {
+    const existing = prev.find(i => i.name === item.name && i.note === item.note);
+    if (existing) return prev.map(i => i.id === existing.id ? {...i, qty:(i.qty||1)+1} : i);
+    return [...prev, { ...item, id: Date.now() }];
+  });
+  const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
+  const updateQty = (id, qty) => {
+    if (qty < 1) { removeFromCart(id); return; }
+    setCart(prev => prev.map(i => i.id === id ? {...i, qty} : i));
+  };
+  const clearCart = () => setCart([]);
+
+  const nav = {
+    screen, setScreen,
+    cart, addToCart, removeFromCart, updateQty, clearCart,
+    cartOpen, setCartOpen,
+    orderPlaced, setOrderPlaced,
+  };
+
+  // Kitchen is full-screen, no nav
+  if (screen === 'kitchen') {
+    return <KitchenScreen nav={nav} />;
+  }
+
+  return (
+    <div>
+      {/* ── TOP NAV ─── */}
+      <TopNav nav={nav} />
+
+      {/* ── SCREENS ─── */}
+      <div className="screen-wrap">
+        {screen === 'home'      && <HomeScreen     nav={nav} />}
+        {screen === 'menu'      && <MenuScreen      nav={nav} />}
+        {screen === 'builder'   && <BuilderScreen   nav={nav} />}
+        {screen === 'cart'      && <CartScreen      nav={nav} />}
+        {screen === 'checkout'  && <CheckoutScreen  nav={nav} />}
+        {screen === 'tracking'  && <TrackingScreen  nav={nav} />}
+      </div>
+
+      {/* ── BOTTOM NAV (mobile) ─── */}
+      <BottomNav nav={nav} />
+
+      {/* ── CART DRAWER ─── */}
+      {cartOpen && <CartDrawer nav={nav} />}
+
+      {/* ── TWEAKS PANEL ─── */}
+      <TweaksPanel tweaks={tweaks} setTweaks={setTweaks}>
+        <TweakSection label="Brand">
+          <TweakColor
+            label="Accent colour"
+            value={tweaks.accentColor}
+            options={['#C4341A','#C97F18','#4A5240','#7B3F8C','#1A5C7A']}
+            onChange={v => setTweaks(t => ({...t, accentColor:v}))}
+          />
+          <TweakSelect
+            label="Heading font"
+            value={tweaks.headingFont}
+            options={['Cormorant Garamond','Playfair Display','Georgia','Libre Baskerville']}
+            onChange={v => {
+              setTweaks(t => ({...t, headingFont:v}));
+              document.documentElement.style.setProperty('--fd', `'${v}', Georgia, serif`);
+            }}
+          />
+        </TweakSection>
+        <TweakSection label="Navigation">
+          <TweakToggle
+            label="Show Kitchen link"
+            value={tweaks.showKitchenLink}
+            onChange={v => setTweaks(t => ({...t, showKitchenLink:v}))}
+          />
+        </TweakSection>
+        <TweakSection label="Quick nav">
+          {['home','menu','builder','cart','checkout','tracking','kitchen'].map(s => (
+            <TweakButton key={s} label={`→ ${s.charAt(0).toUpperCase()+s.slice(1)}`}
+              onClick={() => { setScreen(s); setCartOpen(false); }} />
+          ))}
+        </TweakSection>
+        <TweakSection label="Cart testing">
+          <TweakButton label="Add sample item" onClick={() =>
+            addToCart({name:'Diavola',price:17,qty:1,note:'Spicy — scamorza · chili honey'})
+          }/>
+          <TweakButton label="Clear cart" onClick={() => clearCart()} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

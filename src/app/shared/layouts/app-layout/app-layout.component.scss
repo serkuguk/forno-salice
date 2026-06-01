@@ -1,0 +1,96 @@
+.layout-container {
+  display: grid;
+  grid-template-columns: 100%;
+  justify-content: center;
+
+  .layout {
+    display: grid;
+    grid-template-columns: 100%;
+    height: 100%;
+
+    &__filter {
+      margin: 1rem;
+      display: grid;
+      grid-template-columns: 90% 10%;
+      align-items: center;
+
+      &-item {
+      }
+
+      .filter-buttons {
+        justify-self: end;
+        align-self: end;
+        width: 100%;
+      }
+    }
+
+    &__message {
+      margin-bottom: -0.9rem;
+    }
+
+    &__full-filter {
+      margin: 1rem;
+      display: grid;
+      grid-template-columns: 100%;
+      align-items: center;
+
+      &-item {
+      }
+    }
+
+    &__table {
+      margin: 1.5rem 1em 1.5rem 1rem;
+
+      &-block {
+      }
+    }
+
+    &__formulario {
+      display: grid;
+      grid-template-rows: 100%;
+      grid-template-columns: 100%;
+      margin: 1.5rem 1em 1.5rem 1rem;
+
+      &-buttons-icons {
+        display: grid;
+        grid-template-columns: repeat(3, 6.7rem);
+        align-content: center;
+        justify-content: end;
+
+        h6 {
+          justify-self: end;
+        }
+      }
+
+      &-custom-block {
+        display: grid;
+        grid-template-columns: repeat(1, 52em);
+        align-content: center;
+        justify-content: end;
+
+        h6 {
+          justify-self: end;
+        }
+      }
+
+      &-forms {
+      }
+    }
+
+    &__buttons {
+      display: flex;
+      margin: 1.5rem 1em 1.5rem 1rem;
+
+      app-button {
+        min-height: 2rem;
+        width: 10rem;
+        margin-right: 1rem;
+      }
+
+    }
+  }
+}
+
+:host .card-header {
+  border: none !important;
+}

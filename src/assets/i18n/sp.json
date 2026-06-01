@@ -1,0 +1,65 @@
+{
+  "PAGES" : {
+    "HOME" : {
+      "TITLE": "Bien benido a NTT DATA",
+      "WELCOME": "Gracias {{name}}"
+    },
+    "LOGIN" :  {
+      "TITLE": "Formulario de inicio",
+      "USER" : "Ususario",
+      "PASSWORD": "Contraseña"
+    }
+  },
+  "SIDENAV": {
+    "DASHBOARD" : "Panel",
+    "EXAMPLES" : "Ejemplos",
+    "STATISTIC" : "Estadística",
+    "COUPONS" : "Cupones",
+    "PAGES" : "Paginas",
+    "MEDIA" : "Media",
+    "SETTINGS" : "Configuración"
+  },
+  "SIDENAV_SUB" : {
+    "TABLES" : "Tables",
+    "BUTTONS" : "Botones",
+    "DROPDOWNS" : "Selectores",
+    "CHARTS" : "Graficó",
+    "FORMS" : "Formularios",
+    "STEPPER" : "Stepper",
+    "CALENDAR" : "Calendar",
+    "LIST_COUPONS" : "Lista de Cupones",
+    "CREATE_COUPONS" : "Crear Cupones",
+    "SETTINGS_LEVEL_1.1" : "Configuración Nivel Uno",
+    "SETTINGS_LEVEL_ONE_2.1" : "Configuración Nivel Uno 2.1",
+    "SETTINGS_LEVEL_TWO_2.1" : "Configuración Nivel Dos 2.1",
+    "SETTINGS_LEVEL_2.2" : "Configuración Nivel 2.2",
+    "SETTINGS_LEVEL_2.3" : "Configuración Nivel 2.3"
+  },
+  "USER_PANEL" : {
+    "PROFILE" : "Perfil",
+    "SETTINGS" : "Configuración",
+    "LOCK_SCREEN" : "Bloq pantalla",
+    "LOGOUT" : "Salir"
+  },
+  "BUTTON" : {
+    "LANG": {
+      "EN": "Ingles",
+      "SP": "Español"
+    },
+    "LOGIN": "Accesso"
+  },
+  "FORMS" : {
+    "FORM_TYPE" : {
+      "DYNAMIC": "Forma dinámica",
+      "BASIC": ""
+    },
+    "HEADER_TITLE": "Información de envío",
+    "TYPE": {
+      "PERSON": "Individual",
+      "LEGAL": "Entidad legal"
+    }
+  },
+  "ERRORS": {
+    "FIELD_REQUIRED": "Este campo es obligatorio"
+  }
+}

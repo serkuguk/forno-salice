@@ -1,0 +1,10 @@
+<div class="footer-wrapper" [ngClass]="getFooterClass()">
+  <div class="footer-container">
+    @if (isAuthenticated$ | async) {
+      <div class="footer-container__logo">
+        <img src="/assets/img/logo/nttD.png" alt="Forno logo">
+        <span>Forno & Slice</span>
+      </div>
+    }
+  </div>
+</div>

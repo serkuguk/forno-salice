@@ -1,0 +1,97 @@
+<div class="sidenav-host">
+  @if (isMobile() && mobileOpen()) {
+    <div class="sidenav-backdrop" (click)="closeDrawer()"></div>
+  }
+
+  <nav class="sidenav"
+       [ngClass]="{
+         'sidenav-collapsed': collapsed(),
+         'sidenav--mobile-open': isMobile() && mobileOpen()
+       }"
+       aria-label="Main navigation">
+    <div class="logo-container">
+      <button (click)="isMobile() ? closeDrawer() : toggleCollapse()" class="logo"
+              [attr.aria-label]="collapsed() ? 'Collapse menu' : 'Expand menu'"
+              [attr.aria-expanded]="collapsed()">
+  <!--      <img src="..\assets\img\logo\nttD.png" alt="">-->
+      </button>
+      @if (isExpanded()) {
+        <div class="logo-text" animate.enter="nav-fade-enter" animate.leave="nav-fade-leave">{{'NTTDATA'}}</div>
+
+        <button (click)="isMobile() ? closeDrawer() : closeSidenav()" class="btn-close" animate.enter="rotate-enter" aria-label="Close menu">
+          <i class="fal fa-times close-icon"></i>
+        </button>
+      }
+    </div>
+
+    <div class="scrollwrap scrollwrap_delayed">
+      <ul class="sidenav-nav">
+        @for (data of navData; track data.routerLink) {
+          <li class="sidenav-nav-item"
+              (mouseenter)="showSubMenu(data, $event)"
+              (mouseleave)="hideSubMenu()">
+            @if (data.items && data.items.length > 0) {
+              <a (click)="handleClick(data)" [ngClass]="getActiveClass(data)" class="sidenav-nav-link"
+                 [attr.aria-expanded]="data.expanded ?? false">
+                <i class="sidenav-link-icon" [class]="data.icon"></i>
+
+                @if (isExpanded()) {
+                  <span class="sidenav-link-text" animate.enter="nav-fade-enter" animate.leave="nav-fade-leave" translate>{{'SIDENAV.' + data.label}}</span>
+                }
+
+                @if (data.items && isExpanded()) {
+                  <i class="menu-collapse-icon"
+                    [ngClass]="!data.expanded ?
+                        'fal fa-angle-right':
+                        'fal fa-angle-down'"></i>
+                }
+              </a>
+            }
+
+            @if (!data.items || (data.items && data.items.length === 0)) {
+              <a class="sidenav-nav-link" [routerLink]="[data.routerLink]"
+                                          routerLinkActive="active"
+                                          [routerLinkActiveOptions]="{exact: true}"
+                                          [tuiHint]="!isExpanded() ? data.label : ''"
+                                          tuiHintDirection="right"
+                                          (click)="shrinkItems(data); onNavLinkClick()"
+              >
+                <i class="sidenav-link-icon" [class]="data.icon"></i>
+                @if (isExpanded()) {
+                  <span class="sidenav-link-text" animate.enter="nav-fade-enter" animate.leave="nav-fade-leave" translate>{{'SIDENAV.' + data.label}}</span>
+                }
+              </a>
+            }
+
+            @if (isExpanded() && data.items && data.items.length > 0) {
+              <div class="sub-menu">
+                <app-sublevel-menu
+                  [data]="data"
+                  [collapsed]="isExpanded()"
+                  [multiple]="multiple"
+                  [expanded]="data.expanded"
+                ></app-sublevel-menu>
+              </div>
+            }
+          </li>
+
+          @if (!collapsed() && !isMobile() && isSubMenuVisible() && hoveredMenuItem() === data && data.items) {
+            <div class="floating-submenu"
+                 [ngStyle]="submenuPosition()"
+                 (mouseenter)="keepSubMenuOpen()"
+                 (mouseleave)="hideSubMenu()"
+            >
+              <span class="floating-submenu__title" translate>{{'SIDENAV.' + data.label}}</span>
+              <app-sublevel-menu
+                [data]="data"
+                [collapsed]="!collapsed()"
+                [multiple]="multiple"
+                [expanded]="true"
+              ></app-sublevel-menu>
+            </div>
+          }
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

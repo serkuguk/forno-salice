@@ -1,0 +1,39 @@
+<div class="user-panel-wrapper">
+  <div class="user-panel-wrapper__right user-panel">
+    <div class="user-panel-avatar-container">
+      <div class="user-panel-username">{{ (userData$ | async)?.username }}</div>
+      <div class="user-panel-avatar" (click)="userMenuToggle()">
+        <app-avatar
+             [iconType]="'icon'"
+             [icon]="'pi pi-user'"
+             [size]="'large'"
+             [class]="'text'"
+        ></app-avatar>
+      </div>
+    </div>
+  </div>
+
+  @if (showPanel()) {
+    <div class="overlay overlay-user overlay-fall">
+      <ul>
+        @for (item of userItems; track $index) {
+          <li>
+            <a (click)="executeUserEvent(item.userEvent)">
+              <i class="icon" [ngClass]="item.icon"></i>
+              <span translate>{{ 'USER_PANEL.' + item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+      <div class="language">
+        <a (click)="translate.use('sp')">
+          <span>{{ 'Spain' }}</span>
+        </a>
+        |
+        <a (click)="translate.use('en')">
+          <span>{{ 'English' }}</span>
+        </a>
+      </div>
+    </div>
+  }
+</div>

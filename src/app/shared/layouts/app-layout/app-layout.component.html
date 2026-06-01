@@ -1,0 +1,98 @@
+<div class="layout-container">
+  <div class="layout">
+    <div [class]="[showSearchClearButtons ? 'layout__filter' : 'layout__full-filter']">
+      <div class="layout__filter-item">
+        <ng-content select="[filter]"></ng-content>
+      </div>
+
+      <ng-container *ngIf="showSearchClearButtons">
+        <div class="layout__filter-item filter-buttons">
+          <search-clear-button
+            [disabledSearch]="!canSearch"
+            (clearEvent)="clearButtonEvent()"
+            (searchEvent)="searchButtonEvent()">
+          </search-clear-button>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="layout__message">
+      <app-messages
+        [message]="messages"
+      ></app-messages>
+    </div>
+
+    <ng-container *ngIf="tableTitleBlock">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-2">
+            <label class="labelCollapse">{{ tableTitle | customTranslate | async }}</label>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="showTable">
+      <div class="layout__table">
+        <div class="layout__table-block">
+          <ng-content select="[table]"></ng-content>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="showFormulario" class="layout__formulario">
+      <div class="layout__formulario-forms">
+        <ng-content select="[formulario]"></ng-content>
+      </div>
+    </div>
+
+    <div class="layout__buttons">
+      <ng-container *ngIf="newSaveRemoveButtons">
+        <app-button *ngIf="buttonNew"
+                    (click)="newButtonEvent()"
+                    [style]="{'width': '10rem'}"
+                    [disabled]="!canCreateNew"
+                    label="{{ buttonNewName | customTranslate | async }}"
+                    [icon]="'fa fa-fw fa-plus-square'"
+                    [iconPos]="'left'">
+        </app-button>
+
+        <app-button *ngIf="buttonSave"
+                    (click)="saveButtonEvent()"
+                    [disabled]="!canSave"
+                    [style]="{'width': '10rem'}"
+                    label="{{ buttonSaveName | customTranslate | async }}"
+                    [icon]="'fa fa-save'"
+                    [iconPos]="'left'"
+        ></app-button>
+
+        <app-button *ngIf="buttonSave"
+                    (click)="cancelButtonEvent()"
+                    [disabled]="!canCancel"
+                    [style]="{'width': '10rem'}"
+                    label="{{ 'CANCEL' | customTranslate | async }}"
+                    [icon]="'fa fa-close'"
+                    [iconPos]="'left'"
+        ></app-button>
+
+        <app-button *ngIf="buttonEdit"
+                    (click)="editButtonEvent()"
+                    [disabled]="!canEdit"
+                    [style]="{'width': '10rem'}"
+                    label="{{ buttonEditName | customTranslate | async }}"
+                    [icon]="'fa fa-edit'"
+                    [iconPos]="'left'"
+        ></app-button>
+
+        <app-button *ngIf="buttonRemove"
+                    (click)="deleteItem()"
+                    [disabled]="!canEdit"
+                    [style]="{'width': '10rem'}"
+                    label="{{ 'BORRAR' | customTranslate | async }}"
+                    [icon]="'fa fa-trash'"
+                    [iconPos]="'left'"
+        ></app-button>
+      </ng-container>
+    </div>
+  </div>
+</div>

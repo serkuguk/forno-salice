@@ -1,0 +1,33 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-container__title">
+      <h2>NTT DATA</h2>
+      <h3>{{ 'PAGES.LOGIN.TITLE' | translate }}</h3>
+    </div>
+    <form class="login-container__form" [formGroup]="loginForm">
+      <div class="items">
+        <app-form-field label="Username"
+                        [field]="loginForm.controls.username">
+          <app-basic-input formControlName="username"
+                           [placeholder]="'PAGES.LOGIN.USER' | translate"></app-basic-input>
+        </app-form-field>
+
+        <app-form-field label="Password"
+                        [field]="loginForm.controls.password">
+          <app-password-input formControlName="password"
+                              class="custom-password-size"
+                              [placeholder]="'PAGES.LOGIN.PASSWORD' | translate"></app-password-input>
+        </app-form-field>
+      </div>
+      <div class="login-error">
+        <span>{{ (loadingError$ | async) }}</span>
+      </div>
+      <app-button
+           [label]="'BUTTON.LOGIN' | translate"
+           [icon]="'pi pi-users'"
+           [size]="'large'"
+           [styleClass]="'button-style'"
+           (click)="login()"></app-button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="multiselect">
+  <p-multiSelect
+    [options]="items()"
+    [panelStyle]="{minWidth:'12em'}"
+    [filter]="filter()"
+    [selectedItemsLabel]="selectedItems"
+    [displaySelectedLabel]="displaySelectedLabel()"
+    [maxSelectedLabels]="maxSelectedLabels()"
+    [style]="style()"
+    [disabled]="isDisabled"
+    [virtualScroll] = "virtualScroll()"
+    [(ngModel)]="value"
+    (onBlur)="onBlur()"
+    (onChange)="onChanged($event)">
+    @if(showIcon()) {
+      <ng-template let-group #group>
+        <div class="flex items-center">
+          <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png"
+               [class]="'mr-2 flag flag-' + group.value"
+               style="width: 20px"
+               alt=""
+          />
+          <span>{{ group.label }}</span>
+        </div>
+      </ng-template>
+    }
+  </p-multiSelect>
+</div>

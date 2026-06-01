@@ -1,0 +1,73 @@
+.sublevel-nav {
+  list-style: none;
+  margin-left: 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 400ms cubic-bezier(0.86, 0, 0.07, 1), opacity 180ms ease;
+
+  .sublevel-nav-item {
+    .sublevel-nav-link {
+      display: flex;
+      align-items: center;
+      height: 3rem;
+      color: #898989;
+      text-decoration: none;
+      border-radius: 0.625rem;
+      transition: all .3s ease;
+
+      .sublevel-link-icon {
+        font-size: 14px;
+        width: 2rem;
+        min-width: 2rem;
+        margin: 0 0.5rem;
+        text-align: center;
+      }
+
+      .sublevel-link-text {
+        margin: 0 0.8rem 0 0.8rem;
+      }
+    }
+
+    .sublevel-nav-link:hover {
+      color: #f3f3f3;
+    }
+  }
+}
+
+.sublevel-nav--expanded {
+  max-height: 1200px;
+  opacity: 1;
+}
+
+.nav-fade-enter {
+  animation: navFadeIn 300ms ease both;
+}
+
+.nav-fade-leave {
+  animation: navFadeOut 180ms ease both;
+}
+
+@keyframes navFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.active-sublevel {
+  color: #f3f3f3 !important;
+}

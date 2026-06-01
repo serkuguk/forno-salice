@@ -1,0 +1,35 @@
+:host .ui-button {
+  background-color: #487e16;
+  color: #ffffff;
+  border-color: #487e16;
+  font-weight: 400;
+  width: 100%;
+}
+
+:host .ui-button:hover:not(.ui-state-disabled) {
+  background-color: #355d10 !important;
+  border-color: #2f530e !important;
+}
+
+.green {
+  background-color: rgba(72, 126, 22, 1);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.2rem;
+  padding: 0.3rem 1rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.green:hover {
+  background-color: rgba(72, 126, 22, 0.5);
+}
+
+:host ::ng-deep .p-button:not(:disabled):hover {
+  background: rgba(7, 14, 39, 0.8);
+}
+
+:host ::ng-deep .p-button:not(:disabled) {
+  background: rgba(7, 14, 39, 1);
+  color: #fff;
+}

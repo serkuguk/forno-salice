@@ -1,0 +1,67 @@
+.layout-container {
+  display: grid;
+  grid-template-columns: 100%;
+  justify-content: center;
+
+  .layout {
+    display: grid; 
+    grid-template-rows: 5rem 23rem minmax(20%, 30%);
+    grid-template-columns: 100%;
+    height: 100%; 
+
+
+    &__filter {
+      display: grid;
+      grid-template-columns: 92% 8%;
+      align-items: center;
+
+      &-item {
+        
+      }
+
+      .filter-buttons {
+        justify-self: end;
+        height: 0.8rem;
+      }
+    } 
+
+    &__table {
+      &-block {
+        max-height: 23rem;
+      }
+    }
+    &__formulario {
+      display: grid;
+      grid-template-rows: 3rem 1fr;
+      grid-template-columns: 100%;
+      &-buttons-icons {
+        display: grid;
+        grid-template-columns: repeat(3, 6.7rem);
+        align-content: center;
+        justify-content: end;
+        h6 {
+          justify-self: end;
+        }
+      }
+
+      &-forms {
+
+      }
+    }
+    &__buttons {
+      display: grid;
+      grid-template-columns: 7rem 8rem 80%;
+      align-items: end;
+      min-height: 2rem;
+      z-index: 0;
+      margin-top: 1rem;
+    }
+  }
+}
+
+.naranja {
+  color: #e77236;
+  font-size: 0.8em;
+  width: 50rem;
+  padding-top: 0.3rem;
+}
