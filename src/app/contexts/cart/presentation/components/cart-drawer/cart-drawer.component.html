@@ -7,12 +7,13 @@
         <p class="cart-drawer__label">Your Order</p>
         <h2 class="cart-drawer__count">
           @if (isEmpty()) {
-            Empty
+            0 items
           } @else {
             {{ cart()!.lines.length }} item{{ cart()!.lines.length === 1 ? '' : 's' }}
           }
         </h2>
       </div>
+
       <button class="cart-drawer__close" type="button" (click)="close()" aria-label="Close cart">
         <span class="material-icons">close</span>
       </button>
@@ -34,22 +35,30 @@
             <li class="cart-line">
               <div class="cart-line__info">
                 <p class="cart-line__name">{{ line.name }}</p>
+
                 @if (line.customization.size || line.customization.dough || line.customization.extraToppings.length) {
                   <p class="cart-line__notes">
-                    {{ line.customization.size || 'standard' }}
+                    @if (line.customization.size) {
+                      {{ line.customization.size }}
+                    }
                     @if (line.customization.dough) {
-                      · {{ line.customization.dough }}
+                      @if (line.customization.size) { · }
+                      {{ line.customization.dough }}
                     }
                     @if (line.customization.extraToppings.length) {
-                      · {{ line.customization.extraToppings.join(', ') }}
+                      @if (line.customization.size || line.customization.dough) { · }
+                      {{ line.customization.extraToppings.join(' · ') }}
                     }
                   </p>
                 }
+
                 @if (line.notes) {
                   <p class="cart-line__notes">{{ line.notes }}</p>
                 }
+
                 <p class="cart-line__price">{{ line.subtotal.toFixed(2) }} {{ line.currency }}</p>
               </div>
+
               <div class="cart-line__controls">
                 <button
                   class="cart-line__qty-btn"
@@ -58,7 +67,9 @@
                   (click)="updateLineQuantity(line.id, line.quantity - 1)">
                   −
                 </button>
+
                 <span class="cart-line__qty">{{ line.quantity }}</span>
+
                 <button
                   class="cart-line__qty-btn"
                   type="button"
@@ -79,14 +90,17 @@
           <span>Subtotal</span>
           <span>{{ subtotal().toFixed(2) }} {{ cart()!.currency }}</span>
         </div>
+
         <div class="cart-footer__row">
           <span>Delivery</span>
           <span>{{ delivery.toFixed(2) }} {{ cart()!.currency }}</span>
         </div>
+
         <div class="cart-footer__total">
           <span>Total</span>
           <span>{{ total().toFixed(2) }} {{ cart()!.currency }}</span>
         </div>
+
         <button class="cart-footer__checkout" type="button">
           Proceed to Checkout <span aria-hidden="true">→</span>
         </button>
