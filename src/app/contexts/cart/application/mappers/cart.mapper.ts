@@ -5,6 +5,7 @@ import { EntityId } from "@app/core/shared-kernel/types/entity-id/entity-id";
 import { CartLine } from "@app/contexts/cart/domain/entities/cart-line.entity";
 import { AddCartLineDto } from "../dto/add-cart-line.dto";
 import { CartLineVm } from "../dto/cart-line.vm";
+import { normalizeCartLineCustomization } from "../../domain/value-objects/cart-line-customization";
 
 
 export class CartMapper {
@@ -29,6 +30,7 @@ export class CartMapper {
       Money.create(dto.unitPrice, dto.currency),
       dto.quantity,
       dto.notes ?? null,
+      normalizeCartLineCustomization(dto.customization),
     );
   }
 
@@ -43,6 +45,7 @@ export class CartMapper {
       currency: line.unitPrice.currency,
       quantity: line.quantity,
       notes: line.notes,
+      customization: normalizeCartLineCustomization(line.customization),
       subtotal: subtotal.amount,
     };
   }

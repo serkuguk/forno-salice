@@ -4,6 +4,7 @@ import { HttpCartRepository } from './infrastructure/repositories/http-cart.repo
 import { AddLineUseCase } from './application/use-cases/add-line.use-case';
 import { GetCartUseCase } from './application/use-cases/get-cart.use-case';
 import { RemoveLineUseCase } from './application/use-cases/remove-line.use-case';
+import { UpdateLineQuantityUseCase } from './application/use-cases/update-line-quantity.use-case';
 
 /**
  * Связывает доменную абстракцию CartRepository с её infrastructure-реализацией
@@ -25,6 +26,11 @@ export const CART_PROVIDERS: Provider[] = [
   {
     provide: RemoveLineUseCase,
     useFactory: (repository: CartRepository) => new RemoveLineUseCase(repository),
+    deps: [CartRepository],
+  },
+  {
+    provide: UpdateLineQuantityUseCase,
+    useFactory: (repository: CartRepository) => new UpdateLineQuantityUseCase(repository),
     deps: [CartRepository],
   },
 ];

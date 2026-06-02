@@ -1,42 +1,57 @@
-import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { CartVm } from '@app/contexts/cart/application/dto/cart.vm';
 import { GetCartUseCase } from '@app/contexts/cart/application/use-cases/get-cart.use-case';
 import { RemoveLineUseCase } from '@app/contexts/cart/application/use-cases/remove-line.use-case';
 import { UpdateLineQuantityUseCase } from '@app/contexts/cart/application/use-cases/update-line-quantity.use-case';
-import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
+import { CartDrawerService } from '../../services/cart-drawer.service';
 
 @Component({
-  selector: 'app-cart-page',
+  selector: 'app-cart-drawer',
   standalone: true,
-  templateUrl: './cart-page.component.html',
-  styleUrl: './cart-page.component.scss',
-  imports: [CommonModule, RouterLink, FornoShellComponent],
+  templateUrl: './cart-drawer.component.html',
+  styleUrl: './cart-drawer.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CartPageComponent {
+export class CartDrawerComponent {
   private readonly destroyRef = inject(DestroyRef);
+  readonly drawerService = inject(CartDrawerService);
   private readonly getCartUseCase = inject(GetCartUseCase);
   private readonly removeLineUseCase = inject(RemoveLineUseCase);
   private readonly updateLineQuantityUseCase = inject(UpdateLineQuantityUseCase);
 
   readonly cart = signal<CartVm | null>(null);
-  readonly loading = signal(true);
+  readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
   readonly isEmpty = computed(() => {
-    const current = this.cart();
-    return !current || current.lines.length === 0;
+    const c = this.cart();
+    return !c || c.lines.length === 0;
   });
 
-  readonly delivery = 2.5;
   readonly subtotal = computed(() => this.cart()?.totalAmount ?? 0);
+  readonly delivery = 2.5;
   readonly total = computed(() => this.subtotal() + this.delivery);
 
   constructor() {
-    this.load();
+    effect(() => {
+      if (this.drawerService.isOpen()) {
+        this.load();
+      }
+    });
+  }
+
+  close(): void {
+    this.drawerService.close();
   }
 
   removeLine(lineId: string): void {

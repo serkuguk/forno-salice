@@ -1,25 +1,21 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { AuthStateService } from '@pages/auth/services/auth-state.service';
+import { CartDrawerComponent } from '@app/contexts/cart/presentation/components/cart-drawer/cart-drawer.component';
+import { CartDrawerService } from '@app/contexts/cart/presentation/services/cart-drawer.service';
 
 @Component({
   selector: 'app-forno-shell',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CartDrawerComponent],
   templateUrl: './forno-shell.component.html',
   styleUrl: './forno-shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FornoShellComponent {
   private readonly router = inject(Router);
-  private readonly authStateService = inject(AuthStateService);
+  readonly cartDrawer = inject(CartDrawerService);
 
   public isActive(path: string): boolean {
     return this.router.url.split('?')[0] === path;
   }
-
-  public logout(): void {
-    this.authStateService.logout().subscribe();
-  }
 }
-

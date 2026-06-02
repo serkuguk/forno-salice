@@ -1,7 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs/operators';
-import { AuthStateService } from '@pages/auth/services/auth-state.service';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'app-root',
@@ -12,15 +10,5 @@ import { AuthStateService } from '@pages/auth/services/auth-state.service';
     styleUrls: ['./app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
-    private readonly authStateService = inject(AuthStateService);
-    private readonly router = inject(Router);
-
-    ngOnInit(): void {
-        this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd)
-        ).subscribe(() => {
-            this.authStateService.init().subscribe();
-        });
-    }
+export class AppComponent {
 }

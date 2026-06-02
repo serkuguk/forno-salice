@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 
 import {ErrorParserService} from "@core/services/error-parser.service";
 import {ToastService} from "@shared/services/toast.service";
-import {HcenApiError} from "@core/interfaces/api-error.interface";
+import { GlobalApiError } from "@core/models/api-response.model";
 
 export type SuccessAction = 'created' | 'updated' | 'deleted' | 'saved';
 export type EntityType =
@@ -54,7 +54,7 @@ export class ToastHelperService {
   /**
    * Mostrar error toast
    */
-  showErrorToast(error: HcenApiError): void {
+  showErrorToast(error: GlobalApiError): void {
     if (!this.errorParser.shouldShowToast(error)) {
       return;
     }

@@ -1,5 +1,10 @@
 import { EntityId } from "@app/core/shared-kernel/types/entity-id/entity-id";
 import { Money } from "@app/core/shared-kernel/value-objects/money/money.value-object";
+import {
+  CartLineCustomization,
+  normalizeCartLineCustomization,
+  sameCartLineCustomization,
+} from "../value-objects/cart-line-customization";
 
 
 export class CartLine {
@@ -9,7 +14,8 @@ export class CartLine {
     public readonly name: string,
     public readonly unitPrice: Money,
     private _quantity: number,
-    public readonly notes: string | null = null
+    public readonly notes: string | null = null,
+    public readonly customization: CartLineCustomization = normalizeCartLineCustomization(),
   ) {
     if (_quantity <= 0) throw new Error("Quantity must be > 0");
   }
@@ -28,7 +34,9 @@ export class CartLine {
   }
 
   sameConfiguration(other: CartLine): boolean {
-    return this.menuItemId.equals(other.menuItemId) && this.notes === other.notes;
+    return this.menuItemId.equals(other.menuItemId)
+      && this.notes === other.notes
+      && sameCartLineCustomization(this.customization, other.customization);
   }
 
   increase(by: number): void {

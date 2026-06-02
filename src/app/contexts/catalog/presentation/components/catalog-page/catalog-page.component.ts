@@ -100,6 +100,13 @@ export class CatalogPageComponent {
         currency: item.currency,
         quantity: 1,
         notes: `${item.description.slice(0, 50)}${item.description.length > 50 ? '...' : ''}`,
+        customization: item.category === 'pizza'
+          ? {
+              size: 'medium',
+              dough: 'classic',
+              extraToppings: [],
+            }
+          : null,
       })
       .pipe(
         catchError((err) => {

@@ -6,5 +6,10 @@ export interface CartLineVm {
   currency: string;
   quantity: number;
   notes: string | null;
+  customization: {
+    size: string | null;
+    dough: string | null;
+    extraToppings: string[];
+  };
   subtotal: number;
 }
