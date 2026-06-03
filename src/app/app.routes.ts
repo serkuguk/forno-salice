@@ -4,8 +4,13 @@ import { CATALOG_PROVIDERS } from './contexts/catalog/catalog.providers';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'menu',
+    redirectTo: 'home',
     pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    loadComponent: () => import('./contexts/catalog/presentation/components/catalog-page/catalog-page.component').then(c => c.CatalogPageComponent),
+    providers: [...CATALOG_PROVIDERS]
   },
   {
     path: 'menu',

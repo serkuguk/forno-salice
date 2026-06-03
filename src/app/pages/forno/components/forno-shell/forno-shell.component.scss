@@ -121,7 +121,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 60;
+  z-index: 202;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: var(--cream);
@@ -130,24 +130,37 @@
 }
 
 .forno-bottom-nav__tab {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 6px 8px;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
   font-size: var(--tx-xs);
   color: var(--warm-gray);
   letter-spacing: .04em;
 }
 
-.forno-bottom-nav__tab .material-icons {
-  font-size: 18px;
-  line-height: 1;
-}
-
 .forno-bottom-nav__tab--active {
   color: var(--red);
   font-weight: 700;
+}
+
+.forno-bottom-nav__badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 16px);
+  background: var(--red);
+  color: var(--cream);
+  border-radius: var(--r4);
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 @media (max-width: 1080px) {

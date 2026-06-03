@@ -99,7 +99,7 @@ export class CatalogPageComponent {
         unitPrice: item.priceValue,
         currency: item.currency,
         quantity: 1,
-        notes: `${item.description.slice(0, 50)}${item.description.length > 50 ? '...' : ''}`,
+        notes: null,
         customization: item.category === 'pizza'
           ? {
               size: 'medium',

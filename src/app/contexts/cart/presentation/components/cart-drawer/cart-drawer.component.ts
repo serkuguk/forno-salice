@@ -97,6 +97,9 @@ export class CartDrawerComponent {
         finalize(() => this.loading.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((cart) => this.cart.set(cart));
+      .subscribe((cart) => {
+        this.cart.set(cart);
+        this.drawerService.setCount(cart.totalItems);
+      });
   }
 }

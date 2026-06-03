@@ -3,8 +3,10 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class CartDrawerService {
   readonly isOpen = signal(false);
+  readonly cartCount = signal<number>(0);
 
   open(): void  { this.isOpen.set(true); }
   close(): void { this.isOpen.set(false); }
   toggle(): void { this.isOpen.update(v => !v); }
+  setCount(n: number): void { this.cartCount.set(n); }
 }
