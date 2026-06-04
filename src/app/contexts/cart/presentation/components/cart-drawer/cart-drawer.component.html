@@ -7,7 +7,7 @@
         <p class="cart-drawer__label">Your Order</p>
         <h2 class="cart-drawer__count">
           @if (isEmpty()) {
-            0 items
+            Your order
           } @else {
             {{ cart()!.lines.length }} item{{ cart()!.lines.length === 1 ? '' : 's' }}
           }
@@ -26,8 +26,14 @@
         <p class="cart-drawer__state cart-drawer__state--error">{{ error() }}</p>
       } @else if (isEmpty()) {
         <div class="cart-drawer__empty">
+          <div class="cart-drawer__empty-icon">
+            <span class="material-icons">local_dining</span>
+          </div>
           <p class="cart-drawer__empty-title">Your cart is empty</p>
           <p class="cart-drawer__empty-sub">Add something delicious from the menu.</p>
+          <button class="cart-drawer__empty-cta" type="button" (click)="close()">
+            View Menu <span aria-hidden="true">→</span>
+          </button>
         </div>
       } @else {
         <ul class="cart-lines">

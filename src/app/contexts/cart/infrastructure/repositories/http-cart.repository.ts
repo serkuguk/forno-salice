@@ -6,6 +6,7 @@ import { HttpClient } from "@angular/common/http";
 import { CartApiResponseDto } from "../api/cart-api.dto";
 import { CartApiMapper } from "../mappers/cart-api.mapper";
 import { environment } from "src/environments/environment";
+import { AddCartLineDto } from "../../application/dto/add-cart-line.dto";
 
 
 @Injectable({ providedIn: 'root' })
@@ -18,6 +19,10 @@ export class HttpCartRepository implements CartRepository {
   getCart(): Observable<Cart> {
     return this.http.get<CartApiResponseDto>(this.baseUrl)
       .pipe(map((dto) => CartApiMapper.toDomain(dto)));
+  }
+
+  addLine(input: AddCartLineDto): Observable<unknown> {
+    return this.http.put(this.baseUrl, input);
   }
 
   saveCart(cart: Cart): Observable<Cart> {

@@ -9,12 +9,8 @@ export class AddLineUseCase {
   constructor(private readonly cartRepository: CartRepository) {}
 
   execute(input: AddCartLineDto): Observable<CartVm> {
-    return this.cartRepository.getCart().pipe(
-      map((cart) => {
-        cart.addLine(CartMapper.toNewLine(input));
-        return cart;
-      }),
-      switchMap((cart) => this.cartRepository.saveCart(cart)),
+    return this.cartRepository.addLine(input).pipe(
+      switchMap(() => this.cartRepository.getCart()),
       map((cart) => CartMapper.toVm(cart)),
     );
   }

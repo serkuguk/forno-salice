@@ -5,8 +5,9 @@ import { catchError, EMPTY, finalize } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { CatalogItemVm } from '@app/contexts/catalog/application/dto/catalog-item.vm';
 import { GetCatalogItemsUseCase } from '@app/contexts/catalog/application/use-cases/get-catalog-items.use-case';
-import { AddLineUseCase } from '@app/contexts/cart/application/use-cases/add-line.use-case';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
+import { AddCatalogItemToCartUseCase } from '@app/contexts/catalog/application/use-cases/add-catalog-item-to-cart.use-case';
+import { CartDrawerService } from '@app/contexts/cart/presentation/services/cart-drawer.service';
 
 type MenuCategory = 'all' | 'classics' | 'signature';
 
@@ -20,7 +21,8 @@ type MenuCategory = 'all' | 'classics' | 'signature';
 export class CatalogPageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly useCase = inject(GetCatalogItemsUseCase);
-  private readonly addLineUseCase = inject(AddLineUseCase);
+  private readonly addToCartUseCase = inject(AddCatalogItemToCartUseCase);
+  private readonly cartDrawer = inject(CartDrawerService);
 
   readonly items = signal<CatalogItemVm[]>([]);
   readonly loading = signal(true);
@@ -30,7 +32,9 @@ export class CatalogPageComponent {
 
   readonly featured = computed(() => {
     const currentItems = this.items();
-    return currentItems.find((item) => item.isFeatured) ?? currentItems[0] ?? null;
+    return (
+      currentItems.find((item) => item.isFeatured) ?? currentItems[0] ?? null
+    );
   });
 
   readonly filtered = computed(() => {
@@ -91,23 +95,8 @@ export class CatalogPageComponent {
   }
 
   addToCart(item: CatalogItemVm): void {
-    this.addLineUseCase
-      .execute({
-        lineId: crypto.randomUUID(),
-        menuItemId: item.id,
-        name: item.title,
-        unitPrice: item.priceValue,
-        currency: item.currency,
-        quantity: 1,
-        notes: null,
-        customization: item.category === 'pizza'
-          ? {
-              size: 'medium',
-              dough: 'classic',
-              extraToppings: [],
-            }
-          : null,
-      })
+    this.addToCartUseCase
+      .execute(item)
       .pipe(
         catchError((err) => {
           console.error('Add to cart failed:', err);
@@ -115,14 +104,18 @@ export class CatalogPageComponent {
         }),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(() => this.addedItemId.set(item.id));
+      .subscribe((cart) => {
+        this.cartDrawer.setCount(cart.totalItems);
+        this.addedItemId.set(item.id);
+      });
   }
 
   private load(): void {
     this.loading.set(true);
     this.error.set(null);
 
-    this.useCase.execute()
+    this.useCase
+      .execute()
       .pipe(
         catchError((err) => {
           console.error('Catalog load failed:', err);
