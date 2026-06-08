@@ -1,0 +1,197 @@
+<app-forno-shell>
+  <section class="checkout-page">
+    <div class="checkout-page__container">
+      @if (loading()) {
+        <p class="checkout-page__state">Loading checkout...</p>
+      } @else if (error()) {
+        <p class="checkout-page__state checkout-page__state--error">{{ error() }}</p>
+      } @else if (checkout(); as checkout) {
+        @if (!checkout.canSubmit) {
+          <div class="checkout-empty">
+            <h2>Your cart is empty</h2>
+            <p>Head to the menu and add something delicious.</p>
+            <a class="btn btn--primary" routerLink="/menu">Browse the menu</a>
+          </div>
+        } @else if (placed()) {
+          <div class="checkout-placed">
+            <p class="checkout-placed__eyebrow">Thank you</p>
+            <h1 class="checkout-placed__title">Order placed</h1>
+            <p class="checkout-placed__text">{{ confirmationText }}</p>
+            <a class="btn btn--primary" routerLink="/menu">Back to menu</a>
+          </div>
+        } @else {
+          <a class="checkout-page__back" routerLink="/cart">← Back to cart</a>
+
+          <div class="checkout-page__layout">
+            <div class="checkout-form">
+              <!-- Delivery / Collection toggle -->
+              <div class="checkout-toggle">
+                <button
+                  type="button"
+                  class="checkout-toggle__option"
+                  [class.checkout-toggle__option--active]="mode() === 'delivery'"
+                  (click)="setMode('delivery')"
+                >
+                  Delivery
+                </button>
+                <button
+                  type="button"
+                  class="checkout-toggle__option"
+                  [class.checkout-toggle__option--active]="mode() === 'collection'"
+                  (click)="setMode('collection')"
+                >
+                  Collection
+                </button>
+              </div>
+
+              <!-- Step indicator -->
+              <ol class="checkout-steps">
+                @for (label of ['Your details', 'Payment', 'Confirm']; track label; let i = $index) {
+                  <li class="checkout-steps__item" [class.checkout-steps__item--active]="i + 1 <= step()">
+                    <span class="checkout-steps__bar"></span>
+                    <span class="checkout-steps__label">{{ label }}</span>
+                  </li>
+                }
+              </ol>
+
+              <form [formGroup]="form" (ngSubmit)="$event.preventDefault()">
+                <!-- Step 1: Contact details -->
+                @if (step() === 1) {
+                  <h2 class="checkout-form__heading">Contact details</h2>
+
+                  <div class="checkout-grid">
+                    <div class="checkout-field checkout-field--full">
+                      <label class="checkout-field__label" for="name">Full name</label>
+                      <input id="name" class="checkout-field__input" type="text" formControlName="name" placeholder="Jane Smith" />
+                      @if (form.controls.name.touched && form.controls.name.invalid) {
+                        <span class="checkout-field__error">Please enter your name.</span>
+                      }
+                    </div>
+
+                    <div class="checkout-field">
+                      <label class="checkout-field__label" for="email">Email</label>
+                      <input id="email" class="checkout-field__input" type="email" formControlName="email" placeholder="jane@example.com" />
+                      @if (form.controls.email.touched && form.controls.email.invalid) {
+                        <span class="checkout-field__error">Enter a valid email.</span>
+                      }
+                    </div>
+
+                    <div class="checkout-field">
+                      <label class="checkout-field__label" for="phone">Phone</label>
+                      <input id="phone" class="checkout-field__input" type="tel" formControlName="phone" placeholder="+44 7700 000000" />
+                      @if (form.controls.phone.touched && form.controls.phone.invalid) {
+                        <span class="checkout-field__error">Please enter a phone number.</span>
+                      }
+                    </div>
+
+                    @if (mode() === 'delivery') {
+                      <div class="checkout-field checkout-field--full">
+                        <label class="checkout-field__label" for="address">Delivery address</label>
+                        <input id="address" class="checkout-field__input" type="text" formControlName="address" placeholder="12 Brick Lane" />
+                        @if (form.controls.address.touched && form.controls.address.invalid) {
+                          <span class="checkout-field__error">Please enter a delivery address.</span>
+                        }
+                      </div>
+
+                      <div class="checkout-field">
+                        <label class="checkout-field__label" for="postcode">Postcode</label>
+                        <input id="postcode" class="checkout-field__input" type="text" formControlName="postcode" placeholder="E1 6RF" />
+                        @if (form.controls.postcode.touched && form.controls.postcode.invalid) {
+                          <span class="checkout-field__error">Please enter a postcode.</span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <button type="button" class="btn btn--primary checkout-form__advance" (click)="continueToPayment()">
+                    Continue to payment →
+                  </button>
+                }
+
+                <!-- Step 2: Payment -->
+                @if (step() === 2) {
+                  <h2 class="checkout-form__heading">Payment</h2>
+
+                  <div class="checkout-panel">
+                    <p class="checkout-panel__title">Card details</p>
+                    <div class="checkout-grid">
+                      <div class="checkout-field checkout-field--full">
+                        <label class="checkout-field__label" for="card">Card number</label>
+                        <input id="card" class="checkout-field__input" type="text" formControlName="card" placeholder="4242 4242 4242 4242" maxlength="19" />
+                        @if (form.controls.card.touched && form.controls.card.invalid) {
+                          <span class="checkout-field__error">Enter a valid card number.</span>
+                        }
+                      </div>
+
+                      <div class="checkout-field">
+                        <label class="checkout-field__label" for="expiry">Expiry</label>
+                        <input id="expiry" class="checkout-field__input" type="text" formControlName="expiry" placeholder="MM/YY" maxlength="5" />
+                        @if (form.controls.expiry.touched && form.controls.expiry.invalid) {
+                          <span class="checkout-field__error">Enter an expiry date.</span>
+                        }
+                      </div>
+
+                      <div class="checkout-field">
+                        <label class="checkout-field__label" for="cvv">CVV</label>
+                        <input id="cvv" class="checkout-field__input" type="text" formControlName="cvv" placeholder="123" maxlength="3" />
+                        @if (form.controls.cvv.touched && form.controls.cvv.invalid) {
+                          <span class="checkout-field__error">Enter the CVV.</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="checkout-form__actions">
+                    <button type="button" class="btn btn--ghost" (click)="back()">Back</button>
+                    <button type="button" class="btn btn--primary" (click)="reviewOrder()">Review order →</button>
+                  </div>
+                }
+
+                <!-- Step 3: Confirm -->
+                @if (step() === 3) {
+                  <h2 class="checkout-form__heading">Confirm order</h2>
+
+                  <div class="checkout-confirm">
+                    <p class="checkout-confirm__title">Everything looks good?</p>
+                    <p class="checkout-confirm__text">{{ confirmationText }}</p>
+                  </div>
+
+                  <div class="checkout-form__actions">
+                    <button type="button" class="btn btn--ghost" (click)="back()">Back</button>
+                    <button type="button" class="btn btn--primary" (click)="placeOrder()">
+                      Place order — £{{ total().toFixed(2) }}
+                    </button>
+                  </div>
+                }
+              </form>
+            </div>
+
+            <!-- Order summary -->
+            <aside class="order-summary">
+              <div class="order-summary__header">
+                <h2 class="order-summary__title">Order summary</h2>
+              </div>
+              <div class="order-summary__body">
+                @for (line of checkout.cart.lines; track line.id) {
+                  <div class="order-summary__row">
+                    <span class="order-summary__name">{{ line.name }} ×{{ line.quantity }}</span>
+                    <span>£{{ line.subtotal.toFixed(2) }}</span>
+                  </div>
+                }
+                <div class="order-summary__divider"></div>
+                <div class="order-summary__row">
+                  <span>{{ mode() === 'delivery' ? 'Delivery' : 'Collection' }}</span>
+                  <span>{{ mode() === 'delivery' ? '£' + delivery().toFixed(2) : 'Free' }}</span>
+                </div>
+                <div class="order-summary__row order-summary__row--total">
+                  <span>Total</span>
+                  <span>£{{ total().toFixed(2) }}</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        }
+      }
+    </div>
+  </section>
+</app-forno-shell>
