@@ -31,10 +31,6 @@ export class CartPageComponent {
     return !current || current.lines.length === 0;
   });
 
-  readonly delivery = 2.5;
-  readonly subtotal = computed(() => this.cart()?.totalAmount ?? 0);
-  readonly total = computed(() => this.subtotal() + this.delivery);
-
   constructor() {
     this.load();
   }

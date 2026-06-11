@@ -6,7 +6,10 @@ import { RouterLink } from '@angular/router';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
 import { CheckoutVm } from '@app/contexts/ordering/application/dto/checkout.vm';
+import { OrderConfirmationVm } from '@app/contexts/ordering/application/dto/order-confirmation.vm';
+import { PlaceOrderDto } from '@app/contexts/ordering/application/dto/place-order.dto';
 import { GetCheckoutUseCase } from '@app/contexts/ordering/application/use-cases/get-checkout.use-case';
+import { PlaceOrderUseCase } from '@app/contexts/ordering/application/use-cases/place-order.use-case';
 
 type CheckoutMode = 'delivery' | 'collection';
 type CheckoutStep = 1 | 2 | 3;
@@ -21,6 +24,7 @@ type CheckoutStep = 1 | 2 | 3;
 export class CheckoutPageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly getCheckoutUseCase = inject(GetCheckoutUseCase);
+  private readonly placeOrderUseCase = inject(PlaceOrderUseCase);
   private readonly fb = inject(FormBuilder);
 
   readonly checkout = signal<CheckoutVm | null>(null);
@@ -29,25 +33,33 @@ export class CheckoutPageComponent {
 
   readonly mode = signal<CheckoutMode>('delivery');
   readonly step = signal<CheckoutStep>(1);
-  readonly placed = signal(false);
+  readonly placing = signal(false);
+  readonly placeError = signal<string | null>(null);
+  readonly confirmation = signal<OrderConfirmationVm | null>(null);
+  readonly placed = computed(() => this.confirmation() !== null);
 
   readonly form = this.fb.nonNullable.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', Validators.required],
     address: ['', Validators.required],
+    city: ['', Validators.required],
     postcode: ['', Validators.required],
     card: ['', [Validators.required, Validators.minLength(12)]],
     expiry: ['', [Validators.required, Validators.minLength(4)]],
     cvv: ['', [Validators.required, Validators.minLength(3)]],
   });
 
-  readonly subtotal = computed(() => this.checkout()?.cart.totalAmount ?? 0);
-  readonly delivery = computed(() => (this.mode() === 'delivery' ? 2.5 : 0));
+  // Money math lives in the domain; the view only picks which precomputed
+  // figure applies for the selected fulfillment mode.
+  readonly subtotal = computed(() => this.checkout()?.subtotal ?? 0);
+  readonly delivery = computed(() =>
+    this.mode() === 'delivery' ? this.checkout()?.deliveryFee ?? 0 : 0,
+  );
   readonly total = computed(() => this.subtotal() + this.delivery());
 
   private readonly step1Controls = ['name', 'email', 'phone'] as const;
-  private readonly deliveryControls = ['address', 'postcode'] as const;
+  private readonly deliveryControls = ['address', 'city', 'postcode'] as const;
   private readonly step2Controls = ['card', 'expiry', 'cvv'] as const;
 
   constructor() {
@@ -92,15 +104,48 @@ export class CheckoutPageComponent {
   }
 
   placeOrder(): void {
-    this.placed.set(true);
+    if (this.placing()) {
+      return;
+    }
+    this.placing.set(true);
+    this.placeError.set(null);
+
+    this.placeOrderUseCase
+      .execute(this.buildPlaceOrderDto())
+      .pipe(
+        catchError((err) => {
+          console.error('Place order failed:', err);
+          this.placeError.set('Failed to place order. Please check your details and try again.');
+          return EMPTY;
+        }),
+        finalize(() => this.placing.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((confirmation) => this.confirmation.set(confirmation));
   }
 
   get confirmationText(): string {
+    const confirmation = this.confirmation();
     if (this.mode() === 'delivery') {
       const address = this.form.controls.address.value || 'your address';
-      return `Delivering to ${address} — est. 30–40 min`;
+      const eta = confirmation ? `est. ${confirmation.estimatedMinutes} min` : 'est. 30–40 min';
+      return `Delivering to ${address} — ${eta}`;
     }
     return 'Collection from Forno & Slice, Shoreditch — est. 15–20 min';
+  }
+
+  private buildPlaceOrderDto(): PlaceOrderDto {
+    const value = this.form.getRawValue();
+    return {
+      name: value.name,
+      email: value.email,
+      phone: value.phone,
+      mode: this.mode(),
+      address:
+        this.mode() === 'delivery'
+          ? { street: value.address, city: value.city, postalCode: value.postcode }
+          : null,
+    };
   }
 
   private validateControls(names: readonly string[]): boolean {

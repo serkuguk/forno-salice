@@ -16,6 +16,9 @@
           <div class="checkout-placed">
             <p class="checkout-placed__eyebrow">Thank you</p>
             <h1 class="checkout-placed__title">Order placed</h1>
+            @if (confirmation(); as confirmation) {
+              <p class="checkout-placed__order">Order {{ confirmation.orderId }}</p>
+            }
             <p class="checkout-placed__text">{{ confirmationText }}</p>
             <a class="btn btn--primary" routerLink="/menu">Back to menu</a>
           </div>
@@ -94,6 +97,14 @@
                       </div>
 
                       <div class="checkout-field">
+                        <label class="checkout-field__label" for="city">City</label>
+                        <input id="city" class="checkout-field__input" type="text" formControlName="city" placeholder="London" />
+                        @if (form.controls.city.touched && form.controls.city.invalid) {
+                          <span class="checkout-field__error">Please enter a city.</span>
+                        }
+                      </div>
+
+                      <div class="checkout-field">
                         <label class="checkout-field__label" for="postcode">Postcode</label>
                         <input id="postcode" class="checkout-field__input" type="text" formControlName="postcode" placeholder="E1 6RF" />
                         @if (form.controls.postcode.touched && form.controls.postcode.invalid) {
@@ -153,13 +164,19 @@
 
                   <div class="checkout-confirm">
                     <p class="checkout-confirm__title">Everything looks good?</p>
-                    <p class="checkout-confirm__text">{{ confirmationText }}</p>
+                    <p class="checkout-confirm__text">
+                      {{ mode() === 'delivery' ? 'Delivery' : 'Collection from Forno & Slice, Shoreditch' }}
+                    </p>
                   </div>
 
+                  @if (placeError()) {
+                    <p class="checkout-field__error">{{ placeError() }}</p>
+                  }
+
                   <div class="checkout-form__actions">
-                    <button type="button" class="btn btn--ghost" (click)="back()">Back</button>
-                    <button type="button" class="btn btn--primary" (click)="placeOrder()">
-                      Place order — £{{ total().toFixed(2) }}
+                    <button type="button" class="btn btn--ghost" (click)="back()" [disabled]="placing()">Back</button>
+                    <button type="button" class="btn btn--primary" (click)="placeOrder()" [disabled]="placing()">
+                      {{ placing() ? 'Placing…' : 'Place order — £' + total().toFixed(2) }}
                     </button>
                   </div>
                 }
@@ -172,7 +189,7 @@
                 <h2 class="order-summary__title">Order summary</h2>
               </div>
               <div class="order-summary__body">
-                @for (line of checkout.cart.lines; track line.id) {
+                @for (line of checkout.lines; track line.id) {
                   <div class="order-summary__row">
                     <span class="order-summary__name">{{ line.name }} ×{{ line.quantity }}</span>
                     <span>£{{ line.subtotal.toFixed(2) }}</span>

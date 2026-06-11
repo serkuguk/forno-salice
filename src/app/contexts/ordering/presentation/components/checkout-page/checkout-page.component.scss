@@ -351,6 +351,13 @@ $border: #d5ccb8;
   color: $warm-gray;
 }
 
+.checkout-placed__order {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: inherit;
+}
+
 @media (min-width: 900px) {
   .checkout-page__layout {
     grid-template-columns: minmax(0, 1fr) 360px;

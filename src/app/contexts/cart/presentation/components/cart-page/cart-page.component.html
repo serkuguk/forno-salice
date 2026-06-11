@@ -57,18 +57,11 @@
               <span>Items</span>
               <span>{{ cart.totalItems }}</span>
             </div>
-            <div class="cart-summary__row">
-              <span>Subtotal</span>
-              <span>{{ subtotal().toFixed(2) }} {{ cart.currency }}</span>
-            </div>
-            <div class="cart-summary__row">
-              <span>Delivery</span>
-              <span>{{ delivery.toFixed(2) }} {{ cart.currency }}</span>
-            </div>
             <div class="cart-summary__row cart-summary__row--total">
-              <span>Total</span>
-              <strong>{{ total().toFixed(2) }} {{ cart.currency }}</strong>
+              <span>Subtotal</span>
+              <strong>{{ cart.totalAmount.toFixed(2) }} {{ cart.currency }}</strong>
             </div>
+            <p class="cart-summary__note">Delivery calculated at checkout.</p>
             <a class="cart-page__cta" routerLink="/checkout">Proceed to Checkout</a>
           </aside>
         </div>
