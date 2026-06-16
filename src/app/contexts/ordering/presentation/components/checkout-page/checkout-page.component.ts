@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
 import { CheckoutVm } from '@app/contexts/ordering/application/dto/checkout.vm';
@@ -26,6 +26,7 @@ export class CheckoutPageComponent {
   private readonly getCheckoutUseCase = inject(GetCheckoutUseCase);
   private readonly placeOrderUseCase = inject(PlaceOrderUseCase);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   readonly checkout = signal<CheckoutVm | null>(null);
   readonly loading = signal(true);
@@ -54,7 +55,7 @@ export class CheckoutPageComponent {
   // figure applies for the selected fulfillment mode.
   readonly subtotal = computed(() => this.checkout()?.subtotal ?? 0);
   readonly delivery = computed(() =>
-    this.mode() === 'delivery' ? this.checkout()?.deliveryFee ?? 0 : 0,
+    this.mode() === 'delivery' ? (this.checkout()?.deliveryFee ?? 0) : 0,
   );
   readonly total = computed(() => this.subtotal() + this.delivery());
 
@@ -100,7 +101,9 @@ export class CheckoutPageComponent {
   }
 
   back(): void {
-    this.step.update((current) => (current > 1 ? ((current - 1) as CheckoutStep) : current));
+    this.step.update((current) =>
+      current > 1 ? ((current - 1) as CheckoutStep) : current,
+    );
   }
 
   placeOrder(): void {
@@ -115,20 +118,24 @@ export class CheckoutPageComponent {
       .pipe(
         catchError((err) => {
           console.error('Place order failed:', err);
-          this.placeError.set('Failed to place order. Please check your details and try again.');
+          this.placeError.set(
+            'Failed to place order. Please check your details and try again.',
+          );
           return EMPTY;
         }),
         finalize(() => this.placing.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((confirmation) => this.confirmation.set(confirmation));
+      .subscribe((confirmation) => this.router.navigate(['/tracking', confirmation.orderId]));
   }
 
   get confirmationText(): string {
     const confirmation = this.confirmation();
     if (this.mode() === 'delivery') {
       const address = this.form.controls.address.value || 'your address';
-      const eta = confirmation ? `est. ${confirmation.estimatedMinutes} min` : 'est. 30–40 min';
+      const eta = confirmation
+        ? `est. ${confirmation.estimatedMinutes} min`
+        : 'est. 30–40 min';
       return `Delivering to ${address} — ${eta}`;
     }
     return 'Collection from Forno & Slice, Shoreditch — est. 15–20 min';
@@ -143,7 +150,11 @@ export class CheckoutPageComponent {
       mode: this.mode(),
       address:
         this.mode() === 'delivery'
-          ? { street: value.address, city: value.city, postalCode: value.postcode }
+          ? {
+              street: value.address,
+              city: value.city,
+              postalCode: value.postcode,
+            }
           : null,
     };
   }

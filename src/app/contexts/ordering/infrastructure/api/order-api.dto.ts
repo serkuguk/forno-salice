@@ -34,3 +34,14 @@ export interface PlaceOrderResponseDto {
   estimatedMinutes: number;
   createdAt: string;
 }
+
+export interface OrderTrackingResponseDto {
+  orderId: string;
+  status: string;
+  estimatedMinutes: number;
+  createdAt: string;
+  fulfillment: {
+    mode: FulfillmentMode;
+  };
+  lines: OrderApiLineDto[];
+}

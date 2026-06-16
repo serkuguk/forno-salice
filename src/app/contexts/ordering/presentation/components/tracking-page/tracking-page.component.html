@@ -1,0 +1,94 @@
+<!-- src/app/contexts/ordering/presentation/components/tracking-page/tracking-page.component.html -->
+<app-forno-shell>
+  <section class="tracking-page">
+    <div class="tracking-page__container">
+      @if (loading()) {
+        <p class="tracking-page__state">Loading tracking...</p>
+      } @else if (error()) {
+        <p class="tracking-page__state tracking-page__state--error">{{ error() }}</p>
+      } @else if (tracking(); as tracking) {
+        <header class="tracking-hero">
+          <div>
+            <p class="tracking-hero__eyebrow">Live tracking</p>
+            <h1 class="tracking-hero__title">Order #{{ tracking.orderId }}</h1>
+          </div>
+
+          <div class="tracking-hero__eta">
+            <span class="tracking-hero__eta-label">Est. delivery</span>
+            <strong class="tracking-hero__eta-value">{{ tracking.etaMinutes }} min</strong>
+          </div>
+        </header>
+
+        <section class="tracking-status-card">
+          <div class="tracking-status-card__icon">
+            <span class="material-icons">{{ statusIcon() }}</span>
+          </div>
+
+          <div class="tracking-status-card__body">
+            <p class="tracking-status-card__eyebrow">Current status</p>
+            <h2 class="tracking-status-card__title">{{ tracking.statusLabel }}</h2>
+            <p class="tracking-status-card__text">{{ tracking.statusBody }}</p>
+          </div>
+        </section>
+
+        <section class="tracking-panel">
+          <header class="tracking-panel__header">
+            <h3>Progress</h3>
+          </header>
+
+          <div class="tracking-timeline">
+            @for (step of tracking.steps; track step.key; let last = $last) {
+              <div class="tracking-step" [class.tracking-step--upcoming]="step.state === 'upcoming'">
+                <div class="tracking-step__rail">
+                  <span
+                    class="tracking-step__dot"
+                    [class.tracking-step__dot--complete]="step.state === 'complete'"
+                    [class.tracking-step__dot--current]="step.state === 'current'">
+                    @if (step.state === 'complete') {
+                      <span class="material-icons">check</span>
+                    }
+                  </span>
+
+                  @if (!last) {
+                    <span
+                      class="tracking-step__line"
+                      [class.tracking-step__line--complete]="step.state === 'complete'">
+                    </span>
+                  }
+                </div>
+
+                <div class="tracking-step__content">
+                  <p class="tracking-step__label">{{ step.label }}</p>
+                  @if (step.state === 'current') {
+                    <p class="tracking-step__body">{{ step.body }}</p>
+                  } @else if (step.state === 'complete') {
+                    <p class="tracking-step__body">Complete</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="tracking-panel">
+          <header class="tracking-panel__header">
+            <h3>What's cooking</h3>
+          </header>
+
+          <div class="tracking-items">
+            @for (line of tracking.lines; track line.id) {
+              <div class="tracking-items__row">
+                <span>{{ line.name }} ×{{ line.quantity }}</span>
+                <strong>{{ line.subtotal.toFixed(2) }} {{ line.currency }}</strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="tracking-page__cta">
+          <a class="btn btn--ghost" routerLink="/menu">Back to home</a>
+        </div>
+      }
+    </div>
+  </section>
+</app-forno-shell>

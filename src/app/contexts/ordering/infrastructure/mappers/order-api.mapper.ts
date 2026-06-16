@@ -1,7 +1,7 @@
 import { Order } from '../../domain/entities/order.entity';
 import { OrderStatusValue } from '../../domain/value-objects/order-status';
-import { PlacedOrder } from '../../domain/repositories/order.repository';
-import { PlaceOrderRequestDto, PlaceOrderResponseDto } from '../api/order-api.dto';
+import { PlacedOrder, TrackedOrder } from '../../domain/repositories/order.repository';
+import { OrderTrackingResponseDto, PlaceOrderRequestDto, PlaceOrderResponseDto } from '../api/order-api.dto';
 
 export class OrderApiMapper {
   static toApi(order: Order): PlaceOrderRequestDto {
@@ -17,7 +17,11 @@ export class OrderApiMapper {
         mode: order.fulfillment.mode,
       },
       deliveryAddress: address
-        ? { street: address.street, city: address.city, postalCode: address.postalCode }
+        ? {
+            street: address.street,
+            city: address.city,
+            postalCode: address.postalCode,
+          }
         : null,
       lines: order.lines.map((line) => ({
         id: line.id.value,
@@ -38,6 +42,24 @@ export class OrderApiMapper {
       status: dto.status as OrderStatusValue,
       estimatedMinutes: dto.estimatedMinutes,
       createdAt: dto.createdAt,
+    };
+  }
+
+  static toTrackedOrder(dto: OrderTrackingResponseDto): TrackedOrder {
+    return {
+      orderId: dto.orderId,
+      status: dto.status as OrderStatusValue,
+      estimatedMinutes: dto.estimatedMinutes,
+      createdAt: dto.createdAt,
+      fulfillmentMode: dto.fulfillment.mode,
+      lines: dto.lines.map((line) => ({
+        id: line.id,
+        name: line.name,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        subtotal: line.subtotal,
+        currency: line.currency,
+      })),
     };
   }
 }

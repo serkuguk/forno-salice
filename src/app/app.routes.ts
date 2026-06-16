@@ -31,7 +31,7 @@ export const routes: Routes = [
         (c) => c.CartPageComponent,
       ),
   },
- {
+  {
     path: 'checkout',
     loadComponent: () =>
       import('./contexts/ordering/presentation/components/checkout-page/checkout-page.component').then(
@@ -53,7 +53,14 @@ export const routes: Routes = [
         (c) => c.FornoStubPageComponent,
       ),
   },
-
+  {
+    path: 'tracking/:orderId',
+    loadComponent: () =>
+      import('./contexts/ordering/presentation/components/tracking-page/tracking-page.component').then(
+        (c) => c.TrackingPageComponent,
+      ),
+    providers: [...ORDERING_PROVIDERS],
+  },
   {
     path: '**',
     redirectTo: 'menu',

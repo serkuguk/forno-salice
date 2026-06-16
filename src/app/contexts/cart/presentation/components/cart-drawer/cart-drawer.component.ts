@@ -106,6 +106,7 @@ export class CartDrawerComponent {
   }
 
   goToCheckout(): void {
-     this.router.navigate(['/checkout']);
+    this.drawerService.close();
+    this.router.navigate(['/checkout']);
   }
 }

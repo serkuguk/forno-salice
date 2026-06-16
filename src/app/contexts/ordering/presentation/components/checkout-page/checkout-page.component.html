@@ -12,16 +12,6 @@
             <p>Head to the menu and add something delicious.</p>
             <a class="btn btn--primary" routerLink="/menu">Browse the menu</a>
           </div>
-        } @else if (placed()) {
-          <div class="checkout-placed">
-            <p class="checkout-placed__eyebrow">Thank you</p>
-            <h1 class="checkout-placed__title">Order placed</h1>
-            @if (confirmation(); as confirmation) {
-              <p class="checkout-placed__order">Order {{ confirmation.orderId }}</p>
-            }
-            <p class="checkout-placed__text">{{ confirmationText }}</p>
-            <a class="btn btn--primary" routerLink="/menu">Back to menu</a>
-          </div>
         } @else {
           <a class="checkout-page__back" routerLink="/cart">← Back to cart</a>
 

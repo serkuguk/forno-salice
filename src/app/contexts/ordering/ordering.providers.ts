@@ -7,6 +7,7 @@ import { HttpOrderRepository } from './infrastructure/repositories/http-order.re
 import { CartGatewayAdapter } from './infrastructure/gateways/cart-gateway.adapter';
 import { GetCheckoutUseCase } from './application/use-cases/get-checkout.use-case';
 import { PlaceOrderUseCase } from './application/use-cases/place-order.use-case';
+import { GetOrderTrackingUseCase } from './application/use-cases/get-order-tracking.use-case';
 
 /**
  * Связывает Ordering-порты с их реализациями. OrderRepository → HTTP-адаптер;
@@ -24,7 +25,8 @@ export const ORDERING_PROVIDERS: Provider[] = [
   },
   {
     provide: GetCheckoutUseCase,
-    useFactory: (cartGateway: CartGateway) => new GetCheckoutUseCase(cartGateway),
+    useFactory: (cartGateway: CartGateway) =>
+      new GetCheckoutUseCase(cartGateway),
     deps: [CartGateway],
   },
   {
@@ -32,5 +34,11 @@ export const ORDERING_PROVIDERS: Provider[] = [
     useFactory: (cartGateway: CartGateway, orderRepository: OrderRepository) =>
       new PlaceOrderUseCase(cartGateway, orderRepository),
     deps: [CartGateway, OrderRepository],
+  },
+  {
+    provide: GetOrderTrackingUseCase,
+    useFactory: (orderRepository: OrderRepository) =>
+      new GetOrderTrackingUseCase(orderRepository),
+    deps: [OrderRepository],
   },
 ];
