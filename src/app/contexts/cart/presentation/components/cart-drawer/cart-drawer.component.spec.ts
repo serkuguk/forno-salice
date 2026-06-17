@@ -69,7 +69,64 @@ describe('CartDrawerComponent', () => {
     component = fixture.componentInstance;
     drawerService = TestBed.inject(CartDrawerService);
     router = TestBed.inject(Router);
+    drawerService.open();
     fixture.detectChanges();
+  });
+
+  it('builds derived line labels and formatted totals', () => {
+    component.cart.set(cart);
+    fixture.detectChanges();
+
+    expect(component.itemCountLabel()).toBe('2 items');
+    expect(component.cartLines()).toEqual([
+      {
+        id: 'line-1',
+        name: 'Margherita Ember',
+        quantity: 1,
+        notesLabel: null,
+        customizationLabel: 'medium · classic · extra-cheese',
+        subtotalLabel: '11.70 EUR',
+      },
+      {
+        id: 'line-2',
+        name: 'Cola',
+        quantity: 1,
+        notesLabel: null,
+        customizationLabel: null,
+        subtotalLabel: '2.50 EUR',
+      },
+    ]);
+    expect(component.formattedSubtotal()).toBe('14.20 EUR');
+    expect(component.formattedDelivery()).toBe('2.50 EUR');
+    expect(component.formattedTotal()).toBe('16.70 EUR');
+    expect(component.showFooter()).toBe(true);
+  });
+
+  it('renders precomputed customization and subtotal labels', () => {
+    component.cart.set(cart);
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+
+    expect(text).toContain('2 items');
+    expect(text).toContain('medium · classic · extra-cheese');
+    expect(text).toContain('11.70 EUR');
+    expect(text).toContain('14.20 EUR');
+    expect(text).toContain('16.70 EUR');
+  });
+
+  it('uses the empty item count label and hides footer for empty carts', () => {
+    component.cart.set({
+      ...cart,
+      totalItems: 0,
+      totalAmount: 0,
+      lines: [],
+    });
+    fixture.detectChanges();
+
+    expect(component.itemCountLabel()).toBe('Your order');
+    expect(component.isEmpty()).toBe(true);
+    expect(component.showFooter()).toBe(false);
   });
 
   it('closes the drawer and navigates to checkout', () => {

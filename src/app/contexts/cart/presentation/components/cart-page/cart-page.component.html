@@ -8,7 +8,7 @@
 
       @if (loading()) {
         <p class="cart-page__state">Loading cart...</p>
-      } @else if (error()) {
+      } @else if (hasError()) {
         <p class="cart-page__state cart-page__state--error">{{ error() }}</p>
       } @else if (isEmpty()) {
         <div class="cart-empty">
@@ -16,28 +16,20 @@
           <p>Head back to the menu and add something delicious.</p>
           <a class="cart-page__cta" routerLink="/menu">Browse the menu</a>
         </div>
-      } @else if (cart(); as cart) {
+      } @else if (hasCart()) {
         <div class="cart-page__layout">
           <ul class="cart-lines">
-            @for (line of cart.lines; track line.id) {
+            @for (line of cartLines(); track line.id) {
               <li class="cart-line">
                 <div class="cart-line__info">
                   <p class="cart-line__name">{{ line.name }}</p>
-                  @if (line.customization.size || line.customization.dough || line.customization.extraToppings.length) {
-                    <p class="cart-line__meta">
-                      {{ line.customization.size || 'standard' }}
-                      @if (line.customization.dough) {
-                        · {{ line.customization.dough }}
-                      }
-                      @if (line.customization.extraToppings.length) {
-                        · {{ line.customization.extraToppings.join(', ') }}
-                      }
-                    </p>
+                  @if (line.metaLabel) {
+                    <p class="cart-line__meta">{{ line.metaLabel }}</p>
                   }
-                  @if (line.notes) {
-                    <p class="cart-line__notes">{{ line.notes }}</p>
+                  @if (line.notesLabel) {
+                    <p class="cart-line__notes">{{ line.notesLabel }}</p>
                   }
-                  <p class="cart-line__price">{{ line.subtotal.toFixed(2) }} {{ line.currency }}</p>
+                  <p class="cart-line__price">{{ line.subtotalLabel }}</p>
                 </div>
 
                 <div class="cart-line__actions">
@@ -55,11 +47,11 @@
           <aside class="cart-summary">
             <div class="cart-summary__row">
               <span>Items</span>
-              <span>{{ cart.totalItems }}</span>
+              <span>{{ summaryItemsLabel() }}</span>
             </div>
             <div class="cart-summary__row cart-summary__row--total">
               <span>Subtotal</span>
-              <strong>{{ cart.totalAmount.toFixed(2) }} {{ cart.currency }}</strong>
+              <strong>{{ summarySubtotalLabel() }}</strong>
             </div>
             <p class="cart-summary__note">Delivery calculated at checkout.</p>
             <a class="cart-page__cta" routerLink="/checkout">Proceed to Checkout</a>

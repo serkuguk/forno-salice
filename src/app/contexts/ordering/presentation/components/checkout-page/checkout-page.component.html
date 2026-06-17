@@ -3,10 +3,10 @@
     <div class="checkout-page__container">
       @if (loading()) {
         <p class="checkout-page__state">Loading checkout...</p>
-      } @else if (error()) {
+      } @else if (hasError()) {
         <p class="checkout-page__state checkout-page__state--error">{{ error() }}</p>
-      } @else if (checkout(); as checkout) {
-        @if (!checkout.canSubmit) {
+      } @else if (hasCheckout() && checkout(); as checkout) {
+        @if (showEmptyCheckout()) {
           <div class="checkout-empty">
             <h2>Your cart is empty</h2>
             <p>Head to the menu and add something delicious.</p>
@@ -22,7 +22,7 @@
                 <button
                   type="button"
                   class="checkout-toggle__option"
-                  [class.checkout-toggle__option--active]="mode() === 'delivery'"
+                  [class.checkout-toggle__option--active]="isDelivery()"
                   (click)="setMode('delivery')"
                 >
                   Delivery
@@ -30,7 +30,7 @@
                 <button
                   type="button"
                   class="checkout-toggle__option"
-                  [class.checkout-toggle__option--active]="mode() === 'collection'"
+                  [class.checkout-toggle__option--active]="isCollection()"
                   (click)="setMode('collection')"
                 >
                   Collection
@@ -39,66 +39,66 @@
 
               <!-- Step indicator -->
               <ol class="checkout-steps">
-                @for (label of ['Your details', 'Payment', 'Confirm']; track label; let i = $index) {
-                  <li class="checkout-steps__item" [class.checkout-steps__item--active]="i + 1 <= step()">
+                @for (stepVm of checkoutSteps(); track stepVm.label) {
+                  <li class="checkout-steps__item" [class.checkout-steps__item--active]="stepVm.active">
                     <span class="checkout-steps__bar"></span>
-                    <span class="checkout-steps__label">{{ label }}</span>
+                    <span class="checkout-steps__label">{{ stepVm.label }}</span>
                   </li>
                 }
               </ol>
 
               <form [formGroup]="form" (ngSubmit)="$event.preventDefault()">
                 <!-- Step 1: Contact details -->
-                @if (step() === 1) {
+                @if (isStep1()) {
                   <h2 class="checkout-form__heading">Contact details</h2>
 
                   <div class="checkout-grid">
                     <div class="checkout-field checkout-field--full">
                       <label class="checkout-field__label" for="name">Full name</label>
                       <input id="name" class="checkout-field__input" type="text" formControlName="name" placeholder="Jane Smith" />
-                      @if (form.controls.name.touched && form.controls.name.invalid) {
-                        <span class="checkout-field__error">Please enter your name.</span>
+                      @if (showControlError('name')) {
+                        <span class="checkout-field__error">{{ controlErrorMessage('name') }}</span>
                       }
                     </div>
 
                     <div class="checkout-field">
                       <label class="checkout-field__label" for="email">Email</label>
                       <input id="email" class="checkout-field__input" type="email" formControlName="email" placeholder="jane@example.com" />
-                      @if (form.controls.email.touched && form.controls.email.invalid) {
-                        <span class="checkout-field__error">Enter a valid email.</span>
+                      @if (showControlError('email')) {
+                        <span class="checkout-field__error">{{ controlErrorMessage('email') }}</span>
                       }
                     </div>
 
                     <div class="checkout-field">
                       <label class="checkout-field__label" for="phone">Phone</label>
                       <input id="phone" class="checkout-field__input" type="tel" formControlName="phone" placeholder="+44 7700 000000" />
-                      @if (form.controls.phone.touched && form.controls.phone.invalid) {
-                        <span class="checkout-field__error">Please enter a phone number.</span>
+                      @if (showControlError('phone')) {
+                        <span class="checkout-field__error">{{ controlErrorMessage('phone') }}</span>
                       }
                     </div>
 
-                    @if (mode() === 'delivery') {
+                    @if (showDeliveryAddressFields()) {
                       <div class="checkout-field checkout-field--full">
                         <label class="checkout-field__label" for="address">Delivery address</label>
                         <input id="address" class="checkout-field__input" type="text" formControlName="address" placeholder="12 Brick Lane" />
-                        @if (form.controls.address.touched && form.controls.address.invalid) {
-                          <span class="checkout-field__error">Please enter a delivery address.</span>
+                        @if (showControlError('address')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('address') }}</span>
                         }
                       </div>
 
                       <div class="checkout-field">
                         <label class="checkout-field__label" for="city">City</label>
                         <input id="city" class="checkout-field__input" type="text" formControlName="city" placeholder="London" />
-                        @if (form.controls.city.touched && form.controls.city.invalid) {
-                          <span class="checkout-field__error">Please enter a city.</span>
+                        @if (showControlError('city')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('city') }}</span>
                         }
                       </div>
 
                       <div class="checkout-field">
                         <label class="checkout-field__label" for="postcode">Postcode</label>
                         <input id="postcode" class="checkout-field__input" type="text" formControlName="postcode" placeholder="E1 6RF" />
-                        @if (form.controls.postcode.touched && form.controls.postcode.invalid) {
-                          <span class="checkout-field__error">Please enter a postcode.</span>
+                        @if (showControlError('postcode')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('postcode') }}</span>
                         }
                       </div>
                     }
@@ -110,7 +110,7 @@
                 }
 
                 <!-- Step 2: Payment -->
-                @if (step() === 2) {
+                @if (isStep2()) {
                   <h2 class="checkout-form__heading">Payment</h2>
 
                   <div class="checkout-panel">
@@ -119,24 +119,24 @@
                       <div class="checkout-field checkout-field--full">
                         <label class="checkout-field__label" for="card">Card number</label>
                         <input id="card" class="checkout-field__input" type="text" formControlName="card" placeholder="4242 4242 4242 4242" maxlength="19" />
-                        @if (form.controls.card.touched && form.controls.card.invalid) {
-                          <span class="checkout-field__error">Enter a valid card number.</span>
+                        @if (showControlError('card')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('card') }}</span>
                         }
                       </div>
 
                       <div class="checkout-field">
                         <label class="checkout-field__label" for="expiry">Expiry</label>
                         <input id="expiry" class="checkout-field__input" type="text" formControlName="expiry" placeholder="MM/YY" maxlength="5" />
-                        @if (form.controls.expiry.touched && form.controls.expiry.invalid) {
-                          <span class="checkout-field__error">Enter an expiry date.</span>
+                        @if (showControlError('expiry')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('expiry') }}</span>
                         }
                       </div>
 
                       <div class="checkout-field">
                         <label class="checkout-field__label" for="cvv">CVV</label>
                         <input id="cvv" class="checkout-field__input" type="text" formControlName="cvv" placeholder="123" maxlength="3" />
-                        @if (form.controls.cvv.touched && form.controls.cvv.invalid) {
-                          <span class="checkout-field__error">Enter the CVV.</span>
+                        @if (showControlError('cvv')) {
+                          <span class="checkout-field__error">{{ controlErrorMessage('cvv') }}</span>
                         }
                       </div>
                     </div>
@@ -149,24 +149,22 @@
                 }
 
                 <!-- Step 3: Confirm -->
-                @if (step() === 3) {
+                @if (isStep3()) {
                   <h2 class="checkout-form__heading">Confirm order</h2>
 
                   <div class="checkout-confirm">
                     <p class="checkout-confirm__title">Everything looks good?</p>
-                    <p class="checkout-confirm__text">
-                      {{ mode() === 'delivery' ? 'Delivery' : 'Collection from Forno & Slice, Shoreditch' }}
-                    </p>
+                    <p class="checkout-confirm__text">{{ confirmationText() }}</p>
                   </div>
 
-                  @if (placeError()) {
+                  @if (hasPlaceError()) {
                     <p class="checkout-field__error">{{ placeError() }}</p>
                   }
 
                   <div class="checkout-form__actions">
                     <button type="button" class="btn btn--ghost" (click)="back()" [disabled]="placing()">Back</button>
                     <button type="button" class="btn btn--primary" (click)="placeOrder()" [disabled]="placing()">
-                      {{ placing() ? 'Placing…' : 'Place order — £' + total().toFixed(2) }}
+                      {{ placeOrderLabel() }}
                     </button>
                   </div>
                 }
@@ -179,20 +177,20 @@
                 <h2 class="order-summary__title">Order summary</h2>
               </div>
               <div class="order-summary__body">
-                @for (line of checkout.lines; track line.id) {
+                @for (line of summaryLines(); track line.id) {
                   <div class="order-summary__row">
-                    <span class="order-summary__name">{{ line.name }} ×{{ line.quantity }}</span>
-                    <span>£{{ line.subtotal.toFixed(2) }}</span>
+                    <span class="order-summary__name">{{ line.nameLabel }}</span>
+                    <span>{{ line.subtotalLabel }}</span>
                   </div>
                 }
                 <div class="order-summary__divider"></div>
                 <div class="order-summary__row">
-                  <span>{{ mode() === 'delivery' ? 'Delivery' : 'Collection' }}</span>
-                  <span>{{ mode() === 'delivery' ? '£' + delivery().toFixed(2) : 'Free' }}</span>
+                  <span>{{ fulfillmentLabel() }}</span>
+                  <span>{{ fulfillmentPriceLabel() }}</span>
                 </div>
                 <div class="order-summary__row order-summary__row--total">
                   <span>Total</span>
-                  <span>£{{ total().toFixed(2) }}</span>
+                  <span>{{ formattedTotal() }}</span>
                 </div>
               </div>
             </aside>

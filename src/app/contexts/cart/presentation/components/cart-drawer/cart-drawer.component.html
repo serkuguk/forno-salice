@@ -5,13 +5,7 @@
     <div class="cart-drawer__header">
       <div>
         <p class="cart-drawer__label">Your Order</p>
-        <h2 class="cart-drawer__count">
-          @if (isEmpty()) {
-            Your order
-          } @else {
-            {{ cart()!.lines.length }} item{{ cart()!.lines.length === 1 ? '' : 's' }}
-          }
-        </h2>
+        <h2 class="cart-drawer__count">{{ itemCountLabel() }}</h2>
       </div>
 
       <button class="cart-drawer__close" type="button" (click)="close()" aria-label="Close cart">
@@ -22,7 +16,7 @@
     <div class="cart-drawer__body">
       @if (loading()) {
         <p class="cart-drawer__state">Loading…</p>
-      } @else if (error()) {
+      } @else if (hasError()) {
         <p class="cart-drawer__state cart-drawer__state--error">{{ error() }}</p>
       } @else if (isEmpty()) {
         <div class="cart-drawer__empty">
@@ -37,32 +31,20 @@
         </div>
       } @else {
         <ul class="cart-lines">
-          @for (line of cart()!.lines; track line.id) {
+          @for (line of cartLines(); track line.id) {
             <li class="cart-line">
               <div class="cart-line__info">
                 <p class="cart-line__name">{{ line.name }}</p>
 
-                @if (line.customization.size || line.customization.dough || line.customization.extraToppings.length) {
-                  <p class="cart-line__notes">
-                    @if (line.customization.size) {
-                      {{ line.customization.size }}
-                    }
-                    @if (line.customization.dough) {
-                      @if (line.customization.size) { · }
-                      {{ line.customization.dough }}
-                    }
-                    @if (line.customization.extraToppings.length) {
-                      @if (line.customization.size || line.customization.dough) { · }
-                      {{ line.customization.extraToppings.join(' · ') }}
-                    }
-                  </p>
+                @if (line.customizationLabel) {
+                  <p class="cart-line__notes">{{ line.customizationLabel }}</p>
                 }
 
-                @if (line.notes) {
-                  <p class="cart-line__notes">{{ line.notes }}</p>
+                @if (line.notesLabel) {
+                  <p class="cart-line__notes">{{ line.notesLabel }}</p>
                 }
 
-                <p class="cart-line__price">{{ line.subtotal.toFixed(2) }} {{ line.currency }}</p>
+                <p class="cart-line__price">{{ line.subtotalLabel }}</p>
               </div>
 
               <div class="cart-line__controls">
@@ -90,21 +72,21 @@
       }
     </div>
 
-    @if (!isEmpty() && !loading()) {
+    @if (showFooter()) {
       <div class="cart-drawer__footer">
         <div class="cart-footer__row">
           <span>Subtotal</span>
-          <span>{{ subtotal().toFixed(2) }} {{ cart()!.currency }}</span>
+          <span>{{ formattedSubtotal() }}</span>
         </div>
 
         <div class="cart-footer__row">
           <span>Delivery</span>
-          <span>{{ delivery.toFixed(2) }} {{ cart()!.currency }}</span>
+          <span>{{ formattedDelivery() }}</span>
         </div>
 
         <div class="cart-footer__total">
           <span>Total</span>
-          <span>{{ total().toFixed(2) }} {{ cart()!.currency }}</span>
+          <span>{{ formattedTotal() }}</span>
         </div>
 
         <button

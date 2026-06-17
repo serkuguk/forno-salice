@@ -12,7 +12,28 @@ import {
 } from 'rxjs';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
 import { GetOrderTrackingUseCase } from '@app/contexts/ordering/application/use-cases/get-order-tracking.use-case';
-import { OrderTrackingVm } from '@app/contexts/ordering/application/dto/order-tracking.vm';
+import {
+  OrderTrackingStepVm,
+  OrderTrackingVm,
+} from '@app/contexts/ordering/application/dto/order-tracking.vm';
+
+interface TrackingTimelineStepVm {
+  readonly key: string;
+  readonly label: string;
+  readonly bodyText: string | null;
+  readonly isUpcoming: boolean;
+  readonly isComplete: boolean;
+  readonly isCurrent: boolean;
+  readonly showCheckIcon: boolean;
+  readonly showConnector: boolean;
+  readonly connectorComplete: boolean;
+}
+
+interface TrackingLineItemVm {
+  readonly id: string;
+  readonly nameLabel: string;
+  readonly subtotalLabel: string;
+}
 
 @Component({
   selector: 'app-tracking-page',
@@ -29,19 +50,34 @@ export class TrackingPageComponent {
   readonly tracking = signal<OrderTrackingVm | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly hasTracking = computed(() => this.tracking() !== null);
+  readonly hasError = computed(() => this.error() !== null);
 
   readonly currentStep = computed(
     () =>
       this.tracking()?.steps.find((step) => step.state === 'current') ?? null,
   );
+  readonly heroTitle = computed(() => `Order #${this.tracking()?.orderId ?? ''}`);
+  readonly etaValue = computed(() => `${this.tracking()?.etaMinutes ?? 0} min`);
+  readonly trackingLines = computed<TrackingLineItemVm[]>(() =>
+    (this.tracking()?.lines ?? []).map((line) => ({
+      id: line.id,
+      nameLabel: `${line.name} ×${line.quantity}`,
+      subtotalLabel: this.formatLineSubtotal(line.subtotal, line.currency),
+    })),
+  );
+  readonly timelineSteps = computed<TrackingTimelineStepVm[]>(() =>
+    (this.tracking()?.steps ?? []).map((step, index, steps) =>
+      this.buildTimelineStepVm(step, index, steps.length),
+    ),
+  );
+  readonly statusIcon = computed(() => this.resolveStatusIcon(this.currentStep()?.key));
 
   constructor() {
     this.load();
   }
 
-  statusIcon(): string {
-    const key = this.currentStep()?.key;
-
+  private resolveStatusIcon(key?: string): string {
     switch (key) {
       case 'Placed':
       case 'Confirmed':
@@ -59,6 +95,32 @@ export class TrackingPageComponent {
       default:
         return 'receipt_long';
     }
+  }
+
+  private buildTimelineStepVm(
+    step: OrderTrackingStepVm,
+    index: number,
+    totalSteps: number,
+  ): TrackingTimelineStepVm {
+    const isComplete = step.state === 'complete';
+    const isCurrent = step.state === 'current';
+    const isUpcoming = step.state === 'upcoming';
+
+    return {
+      key: step.key,
+      label: step.label,
+      bodyText: isCurrent ? step.body : isComplete ? 'Complete' : null,
+      isUpcoming,
+      isComplete,
+      isCurrent,
+      showCheckIcon: isComplete,
+      showConnector: index < totalSteps - 1,
+      connectorComplete: isComplete,
+    };
+  }
+
+  private formatLineSubtotal(subtotal: number, currency: string): string {
+    return `${subtotal.toFixed(2)} ${currency}`;
   }
 
   private load(): void {

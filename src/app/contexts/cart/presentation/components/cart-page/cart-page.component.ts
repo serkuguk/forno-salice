@@ -9,6 +9,15 @@ import { RemoveLineUseCase } from '@app/contexts/cart/application/use-cases/remo
 import { UpdateLineQuantityUseCase } from '@app/contexts/cart/application/use-cases/update-line-quantity.use-case';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
 
+interface CartPageLineVm {
+  readonly id: string;
+  readonly name: string;
+  readonly quantity: number;
+  readonly metaLabel: string | null;
+  readonly notesLabel: string | null;
+  readonly subtotalLabel: string;
+}
+
 @Component({
   selector: 'app-cart-page',
   standalone: true,
@@ -25,11 +34,30 @@ export class CartPageComponent {
   readonly cart = signal<CartVm | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly hasCart = computed(() => this.cart() !== null);
+  readonly hasError = computed(() => this.error() !== null);
 
   readonly isEmpty = computed(() => {
     const current = this.cart();
     return !current || current.lines.length === 0;
   });
+  readonly cartLines = computed<CartPageLineVm[]>(() =>
+    (this.cart()?.lines ?? []).map((line) => ({
+      id: line.id,
+      name: line.name,
+      quantity: line.quantity,
+      metaLabel: this.buildMetaLabel(line),
+      notesLabel: line.notes,
+      subtotalLabel: this.formatMoney(line.subtotal, line.currency),
+    })),
+  );
+  readonly summaryItemsLabel = computed(() => `${this.cart()?.totalItems ?? 0}`);
+  readonly summarySubtotalLabel = computed(() =>
+    this.formatMoney(
+      this.cart()?.totalAmount ?? 0,
+      this.cart()?.currency ?? '',
+    ),
+  );
 
   constructor() {
     this.load();
@@ -79,5 +107,31 @@ export class CartPageComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((cart) => this.cart.set(cart));
+  }
+
+  private buildMetaLabel(line: CartVm['lines'][number]): string | null {
+    const parts: string[] = [];
+
+    if (
+      line.customization.size ||
+      line.customization.dough ||
+      line.customization.extraToppings.length
+    ) {
+      parts.push(line.customization.size ?? 'standard');
+    }
+
+    if (line.customization.dough) {
+      parts.push(line.customization.dough);
+    }
+
+    if (line.customization.extraToppings.length) {
+      parts.push(line.customization.extraToppings.join(', '));
+    }
+
+    return parts.length > 0 ? parts.join(' · ') : null;
+  }
+
+  private formatMoney(amount: number, currency: string): string {
+    return `${amount.toFixed(2)} ${currency}`.trim();
   }
 }

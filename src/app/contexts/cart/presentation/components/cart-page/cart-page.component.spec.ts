@@ -9,6 +9,7 @@ import { CartPageComponent } from './cart-page.component';
 
 describe('CartPageComponent', () => {
   let fixture: ComponentFixture<CartPageComponent>;
+  let component: CartPageComponent;
   const updateLineQuantityUseCase = {
     execute: jest.fn(),
   };
@@ -70,6 +71,7 @@ describe('CartPageComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(CartPageComponent);
+    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
@@ -78,6 +80,37 @@ describe('CartPageComponent', () => {
 
     expect(content).toContain('Margherita Ember');
     expect(content).toContain('Cola');
+  });
+
+  it('builds derived line labels and formatted summary values', () => {
+    expect(component.cartLines()).toEqual([
+      {
+        id: 'line-1',
+        name: 'Margherita Ember',
+        quantity: 1,
+        metaLabel: 'medium · classic · extra-cheese',
+        notesLabel: null,
+        subtotalLabel: '11.70 EUR',
+      },
+      {
+        id: 'line-2',
+        name: 'Cola',
+        quantity: 1,
+        metaLabel: null,
+        notesLabel: null,
+        subtotalLabel: '2.50 EUR',
+      },
+    ]);
+    expect(component.summaryItemsLabel()).toBe('2');
+    expect(component.summarySubtotalLabel()).toBe('14.20 EUR');
+  });
+
+  it('renders precomputed meta and subtotal labels', () => {
+    const content = fixture.nativeElement.textContent as string;
+
+    expect(content).toContain('medium · classic · extra-cheese');
+    expect(content).toContain('11.70 EUR');
+    expect(content).toContain('14.20 EUR');
   });
 
   it('updates only the targeted line quantity when plus is clicked', () => {

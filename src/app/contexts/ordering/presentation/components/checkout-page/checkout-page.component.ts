@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
@@ -13,6 +17,27 @@ import { PlaceOrderUseCase } from '@app/contexts/ordering/application/use-cases/
 
 type CheckoutMode = 'delivery' | 'collection';
 type CheckoutStep = 1 | 2 | 3;
+type CheckoutFieldName =
+  | 'name'
+  | 'email'
+  | 'phone'
+  | 'address'
+  | 'city'
+  | 'postcode'
+  | 'card'
+  | 'expiry'
+  | 'cvv';
+
+interface CheckoutStepVm {
+  readonly label: string;
+  readonly active: boolean;
+}
+
+interface CheckoutSummaryLineVm {
+  readonly id: string;
+  readonly nameLabel: string;
+  readonly subtotalLabel: string;
+}
 
 @Component({
   selector: 'app-checkout-page',
@@ -22,6 +47,24 @@ type CheckoutStep = 1 | 2 | 3;
   styleUrl: './checkout-page.component.scss',
 })
 export class CheckoutPageComponent {
+  private static readonly STEP_LABELS = [
+    'Your details',
+    'Payment',
+    'Confirm',
+  ] as const;
+
+  private static readonly FIELD_ERROR_MESSAGES: Record<CheckoutFieldName, string> = {
+    name: 'Please enter your name.',
+    email: 'Enter a valid email.',
+    phone: 'Please enter a phone number.',
+    address: 'Please enter a delivery address.',
+    city: 'Please enter a city.',
+    postcode: 'Please enter a postcode.',
+    card: 'Enter a valid card number.',
+    expiry: 'Enter an expiry date.',
+    cvv: 'Enter the CVV.',
+  };
+
   private readonly destroyRef = inject(DestroyRef);
   private readonly getCheckoutUseCase = inject(GetCheckoutUseCase);
   private readonly placeOrderUseCase = inject(PlaceOrderUseCase);
@@ -38,6 +81,9 @@ export class CheckoutPageComponent {
   readonly placeError = signal<string | null>(null);
   readonly confirmation = signal<OrderConfirmationVm | null>(null);
   readonly placed = computed(() => this.confirmation() !== null);
+  readonly hasCheckout = computed(() => this.checkout() !== null);
+  readonly hasError = computed(() => this.error() !== null);
+  readonly hasPlaceError = computed(() => this.placeError() !== null);
 
   readonly form = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -58,6 +104,45 @@ export class CheckoutPageComponent {
     this.mode() === 'delivery' ? (this.checkout()?.deliveryFee ?? 0) : 0,
   );
   readonly total = computed(() => this.subtotal() + this.delivery());
+  readonly isDelivery = computed(() => this.mode() === 'delivery');
+  readonly isCollection = computed(() => this.mode() === 'collection');
+  readonly isStep1 = computed(() => this.step() === 1);
+  readonly isStep2 = computed(() => this.step() === 2);
+  readonly isStep3 = computed(() => this.step() === 3);
+  readonly showDeliveryAddressFields = computed(() => this.isDelivery());
+  readonly canSubmitCheckout = computed(() => this.checkout()?.canSubmit ?? false);
+  readonly showEmptyCheckout = computed(
+    () => this.hasCheckout() && !this.canSubmitCheckout(),
+  );
+  readonly checkoutSteps = computed<CheckoutStepVm[]>(() =>
+    CheckoutPageComponent.STEP_LABELS.map((label, index) => ({
+      label,
+      active: index + 1 <= this.step(),
+    })),
+  );
+  readonly summaryLines = computed<CheckoutSummaryLineVm[]>(() =>
+    (this.checkout()?.lines ?? []).map((line) => ({
+      id: line.id,
+      nameLabel: `${line.name} ×${line.quantity}`,
+      subtotalLabel: this.formatCurrency(line.subtotal),
+    })),
+  );
+  readonly confirmationText = computed(() =>
+    this.isDelivery()
+      ? 'Delivery'
+      : 'Collection from Forno & Slice, Shoreditch',
+  );
+  readonly fulfillmentLabel = computed(() =>
+    this.isDelivery() ? 'Delivery' : 'Collection',
+  );
+  readonly fulfillmentPriceLabel = computed(() =>
+    this.isDelivery() ? this.formattedDelivery() : 'Free',
+  );
+  readonly formattedDelivery = computed(() => this.formatCurrency(this.delivery()));
+  readonly formattedTotal = computed(() => this.formatCurrency(this.total()));
+  readonly placeOrderLabel = computed(() =>
+    this.placing() ? 'Placing…' : `Place order — ${this.formattedTotal()}`,
+  );
 
   private readonly step1Controls = ['name', 'email', 'phone'] as const;
   private readonly deliveryControls = ['address', 'city', 'postcode'] as const;
@@ -129,16 +214,13 @@ export class CheckoutPageComponent {
       .subscribe((confirmation) => this.router.navigate(['/tracking', confirmation.orderId]));
   }
 
-  get confirmationText(): string {
-    const confirmation = this.confirmation();
-    if (this.mode() === 'delivery') {
-      const address = this.form.controls.address.value || 'your address';
-      const eta = confirmation
-        ? `est. ${confirmation.estimatedMinutes} min`
-        : 'est. 30–40 min';
-      return `Delivering to ${address} — ${eta}`;
-    }
-    return 'Collection from Forno & Slice, Shoreditch — est. 15–20 min';
+  showControlError(name: CheckoutFieldName): boolean {
+    const control = this.form.controls[name];
+    return control.touched && control.invalid;
+  }
+
+  controlErrorMessage(name: CheckoutFieldName): string {
+    return CheckoutPageComponent.FIELD_ERROR_MESSAGES[name];
   }
 
   private buildPlaceOrderDto(): PlaceOrderDto {
@@ -174,6 +256,9 @@ export class CheckoutPageComponent {
     return valid;
   }
 
+  private formatCurrency(value: number): string {
+    return `£${value.toFixed(2)}`;
+  }
   private load(): void {
     this.loading.set(true);
     this.error.set(null);

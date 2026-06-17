@@ -4,18 +4,18 @@
     <div class="tracking-page__container">
       @if (loading()) {
         <p class="tracking-page__state">Loading tracking...</p>
-      } @else if (error()) {
+      } @else if (hasError()) {
         <p class="tracking-page__state tracking-page__state--error">{{ error() }}</p>
-      } @else if (tracking(); as tracking) {
+      } @else if (hasTracking() && tracking(); as tracking) {
         <header class="tracking-hero">
           <div>
             <p class="tracking-hero__eyebrow">Live tracking</p>
-            <h1 class="tracking-hero__title">Order #{{ tracking.orderId }}</h1>
+            <h1 class="tracking-hero__title">{{ heroTitle() }}</h1>
           </div>
 
           <div class="tracking-hero__eta">
             <span class="tracking-hero__eta-label">Est. delivery</span>
-            <strong class="tracking-hero__eta-value">{{ tracking.etaMinutes }} min</strong>
+            <strong class="tracking-hero__eta-value">{{ etaValue() }}</strong>
           </div>
         </header>
 
@@ -37,32 +37,30 @@
           </header>
 
           <div class="tracking-timeline">
-            @for (step of tracking.steps; track step.key; let last = $last) {
-              <div class="tracking-step" [class.tracking-step--upcoming]="step.state === 'upcoming'">
+            @for (step of timelineSteps(); track step.key) {
+              <div class="tracking-step" [class.tracking-step--upcoming]="step.isUpcoming">
                 <div class="tracking-step__rail">
                   <span
                     class="tracking-step__dot"
-                    [class.tracking-step__dot--complete]="step.state === 'complete'"
-                    [class.tracking-step__dot--current]="step.state === 'current'">
-                    @if (step.state === 'complete') {
+                    [class.tracking-step__dot--complete]="step.isComplete"
+                    [class.tracking-step__dot--current]="step.isCurrent">
+                    @if (step.showCheckIcon) {
                       <span class="material-icons">check</span>
                     }
                   </span>
 
-                  @if (!last) {
+                  @if (step.showConnector) {
                     <span
                       class="tracking-step__line"
-                      [class.tracking-step__line--complete]="step.state === 'complete'">
+                      [class.tracking-step__line--complete]="step.connectorComplete">
                     </span>
                   }
                 </div>
 
                 <div class="tracking-step__content">
                   <p class="tracking-step__label">{{ step.label }}</p>
-                  @if (step.state === 'current') {
-                    <p class="tracking-step__body">{{ step.body }}</p>
-                  } @else if (step.state === 'complete') {
-                    <p class="tracking-step__body">Complete</p>
+                  @if (step.bodyText) {
+                    <p class="tracking-step__body">{{ step.bodyText }}</p>
                   }
                 </div>
               </div>
@@ -76,10 +74,10 @@
           </header>
 
           <div class="tracking-items">
-            @for (line of tracking.lines; track line.id) {
+            @for (line of trackingLines(); track line.id) {
               <div class="tracking-items__row">
-                <span>{{ line.name }} ×{{ line.quantity }}</span>
-                <strong>{{ line.subtotal.toFixed(2) }} {{ line.currency }}</strong>
+                <span>{{ line.nameLabel }}</span>
+                <strong>{{ line.subtotalLabel }}</strong>
               </div>
             }
           </div>
