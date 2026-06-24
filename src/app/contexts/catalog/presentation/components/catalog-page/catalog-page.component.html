@@ -49,11 +49,7 @@
         @if (activeCategory() === 'all' && featured(); as featuredItem) {
           <article class="featured-card">
             <div class="featured-card__media">
-              @if (featuredItem.imageUrl) {
-                <img [src]="featuredItem.imageUrl" [alt]="featuredItem.title" />
-              } @else {
-                <div class="featured-card__fallback" aria-hidden="true"></div>
-              }
+              <app-pizza-art variant="featured" [pizzaId]="featuredItem.id" />
             </div>
 
             <div class="featured-card__body">
@@ -88,11 +84,9 @@
                     <span class="menu-badge">{{ item.badge }}</span>
                   }
 
-                  @if (item.imageUrl) {
-                    <img [src]="item.imageUrl" [alt]="item.title" />
-                  } @else {
-                    <div class="menu-card__fallback" aria-hidden="true"></div>
-                  }
+                  <app-pizza-art
+                    [pizzaId]="item.id"
+                    [sauceColor]="item.categoryKey === 'classics' ? '#B83018' : '#A02010'" />
                 </div>
 
                 <div class="menu-card__body">

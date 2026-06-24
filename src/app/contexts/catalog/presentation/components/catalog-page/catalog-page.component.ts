@@ -8,6 +8,7 @@ import { GetCatalogItemsUseCase } from '@app/contexts/catalog/application/use-ca
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
 import { AddCatalogItemToCartUseCase } from '@app/contexts/catalog/application/use-cases/add-catalog-item-to-cart.use-case';
 import { CartDrawerService } from '@app/contexts/cart/presentation/services/cart-drawer.service';
+import { PizzaArtComponent } from '@app/shared/components/pizza-art/pizza-art.component';
 
 type MenuCategory = 'all' | 'classics' | 'signature';
 
@@ -16,7 +17,7 @@ type MenuCategory = 'all' | 'classics' | 'signature';
   standalone: true,
   templateUrl: './catalog-page.component.html',
   styleUrl: './catalog-page.component.scss',
-  imports: [CommonModule, RouterLink, FornoShellComponent],
+  imports: [CommonModule, RouterLink, FornoShellComponent, PizzaArtComponent],
 })
 export class CatalogPageComponent {
   private readonly destroyRef = inject(DestroyRef);
