@@ -15,6 +15,7 @@ export interface OrderTrackingLineVm {
 
 export interface OrderTrackingVm {
   orderId: string;
+  createdAt: string;
   statusLabel: string;
   statusBody: string;
   etaMinutes: number;

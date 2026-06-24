@@ -8,7 +8,7 @@ import { UpdateLineQuantityUseCase } from './application/use-cases/update-line-q
 import { ClearCartUseCase } from './application/use-cases/clear-cart.use-case';
 
 /**
- * Связывает доменную абстракцию CartRepository с её infrastructure-реализацией
+ * Связывает доменную абстракцию CartRepository с её repositories-реализацией
  * и публикует use-cases как DI-токены через factory, сохраняя application-слой
  * свободным от Angular-зависимостей.
  */

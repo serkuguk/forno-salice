@@ -211,7 +211,11 @@ export class CheckoutPageComponent {
         finalize(() => this.placing.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((confirmation) => this.router.navigate(['/tracking', confirmation.orderId]));
+      .subscribe((confirmation) =>
+        this.router.navigate(['/tracking', confirmation.orderId], {
+          state: { confirmation },
+        }),
+      );
   }
 
   showControlError(name: CheckoutFieldName): boolean {

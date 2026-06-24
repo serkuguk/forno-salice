@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { convertToParamMap, ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { OrderConfirmationVm } from '@app/contexts/ordering/application/dto/order-confirmation.vm';
 import { GetOrderTrackingUseCase } from '@app/contexts/ordering/application/use-cases/get-order-tracking.use-case';
 import { OrderTrackingVm } from '@app/contexts/ordering/application/dto/order-tracking.vm';
 import { FornoShellComponent } from '@pages/forno/components/forno-shell/forno-shell.component';
@@ -65,10 +66,14 @@ describe('TrackingPageComponent', () => {
     execute: jest.fn().mockReturnValue(of(trackingVm)),
   };
 
-  async function configureTest(orderId: string | null = 'ord-123'): Promise<void> {
+  async function configureTest(
+    orderId: string | null = 'ord-123',
+    confirmation: OrderConfirmationVm | null = null,
+  ): Promise<void> {
     TestBed.resetTestingModule();
     jest.clearAllMocks();
     getOrderTrackingUseCase.execute.mockReturnValue(of(trackingVm));
+    history.replaceState(confirmation ? { confirmation } : {}, '', '/');
 
     await TestBed.configureTestingModule({
       imports: [TrackingPageComponent],
@@ -179,5 +184,82 @@ describe('TrackingPageComponent', () => {
     expect(component.error()).toBe('Order id is missing');
     expect(getOrderTrackingUseCase.execute).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Order id is missing');
+  });
+
+  it('keeps a newly placed order on an earlier step when api tracking jumps ahead', async () => {
+    const realNow = Date.now;
+    const now = new Date('2026-06-23T12:10:00.000Z').getTime();
+    Date.now = jest.fn(() => now);
+
+    const confirmation: OrderConfirmationVm = {
+      orderId: 'ord-123',
+      status: 'Confirmed',
+      estimatedMinutes: 30,
+      createdAt: '2026-06-23T12:09:00.000Z',
+      total: 27.5,
+      currency: 'GBP',
+    };
+
+    const advancedTrackingVm: OrderTrackingVm = {
+      ...trackingVm,
+      statusLabel: 'Out for delivery',
+      statusBody: 'On its way to you.',
+      steps: [
+        {
+          key: 'Placed',
+          label: 'Order placed',
+          body: 'We have received your order.',
+          state: 'complete',
+        },
+        {
+          key: 'Confirmed',
+          label: 'Confirmed',
+          body: 'Your order is confirmed and queued.',
+          state: 'complete',
+        },
+        {
+          key: 'Preparing',
+          label: 'Prepping',
+          body: 'Chef is stretching dough and firing up the oven.',
+          state: 'complete',
+        },
+        {
+          key: 'Baking',
+          label: 'In the oven',
+          body: 'Your pizza is firing right now.',
+          state: 'complete',
+        },
+        {
+          key: 'Ready',
+          label: 'Ready',
+          body: 'Done. Your order is boxed and ready.',
+          state: 'complete',
+        },
+        {
+          key: 'OutForDelivery',
+          label: 'Out for delivery',
+          body: 'On its way to you.',
+          state: 'current',
+        },
+        {
+          key: 'Delivered',
+          label: 'Delivered',
+          body: 'Enjoy your meal.',
+          state: 'upcoming',
+        },
+      ],
+    };
+
+    getOrderTrackingUseCase.execute.mockReturnValue(of(advancedTrackingVm));
+
+    await configureTest('ord-123', confirmation);
+    fixture.detectChanges();
+
+    expect(component.currentStep()?.key).toBe('Placed');
+    expect(component.timelineSteps()[0]?.isCurrent).toBe(true);
+    expect(component.timelineSteps()[1]?.isUpcoming).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Order placed');
+
+    Date.now = realNow;
   });
 });

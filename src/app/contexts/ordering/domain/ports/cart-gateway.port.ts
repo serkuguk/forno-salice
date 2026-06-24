@@ -19,7 +19,7 @@ export interface CartSnapshot {
 }
 
 /**
- * Порт (ACL) для чтения и очистки корзины. Реализация в infrastructure
+ * Порт (ACL) для чтения и очистки корзины. Реализация в repositories
  * транслирует Cart context в термины Ordering, инвертируя зависимость.
  */
 export abstract class CartGateway {

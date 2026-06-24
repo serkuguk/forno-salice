@@ -168,6 +168,8 @@ describe('CheckoutPageComponent', () => {
     component.placeOrder();
 
     expect(placeOrderUseCase.execute).toHaveBeenCalled();
-    expect(navigateSpy).toHaveBeenCalledWith(['/tracking', confirmationVm.orderId]);
+    expect(navigateSpy).toHaveBeenCalledWith(['/tracking', confirmationVm.orderId], {
+      state: { confirmation: confirmationVm },
+    });
   });
 });

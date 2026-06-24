@@ -6,7 +6,7 @@ import { AddCatalogItemToCartUseCase } from './application/use-cases/add-catalog
 import { AddLineUseCase } from '../cart/application/use-cases/add-line.use-case';
 
 /**
- * Связывает доменную абстракцию CatalogRepository с её infrastructure-реализацией
+ * Связывает доменную абстракцию CatalogRepository с её repositories-реализацией
  * и публикует use-case как DI-токен. Use-cases остаются чистыми (без @Injectable):
  * их создаёт factory, инжектя абстрактный репозиторий, а не конкретный HTTP-класс.
  */

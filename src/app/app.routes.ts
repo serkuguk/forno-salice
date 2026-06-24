@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { CATALOG_PROVIDERS } from './contexts/catalog/catalog.providers';
 import { ORDERING_PROVIDERS } from './contexts/ordering/ordering.providers';
+import { CUSTOMER_PROVIDERS } from './contexts/customer/customer.providers';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,27 @@ export const routes: Routes = [
         (c) => c.TrackingPageComponent,
       ),
     providers: [...ORDERING_PROVIDERS],
+  },
+  {
+    path: 'customer',
+    redirectTo: 'customer/orders',
+    pathMatch: 'full',
+  },
+  {
+    path: 'customer/orders',
+    loadComponent: () =>
+      import('./contexts/customer/presentation/components/order-history-page/order-history-page.component').then(
+        (c) => c.OrderHistoryPageComponent,
+      ),
+    providers: [...CUSTOMER_PROVIDERS],
+  },
+  {
+    path: 'account/orders',
+    loadComponent: () =>
+      import('./contexts/customer/presentation/components/order-history-page/order-history-page.component').then(
+        (c) => c.OrderHistoryPageComponent,
+      ),
+    providers: [...CUSTOMER_PROVIDERS],
   },
   {
     path: '**',

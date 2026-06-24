@@ -1,0 +1,53 @@
+<app-forno-shell>
+  <section class="order-history-page">
+    <div class="order-history-page__container">
+      <header class="order-history-page__hero">
+        <p class="order-history-page__eyebrow">Customer</p>
+        <h1 class="order-history-page__title">Order history</h1>
+        <p class="order-history-page__subtitle">
+          Review previous orders and quickly start a new one.
+        </p>
+      </header>
+
+      @if (loading()) {
+        <p class="order-history-page__state">Loading order history...</p>
+      } @else if (hasError()) {
+        <p class="order-history-page__state order-history-page__state--error">
+          {{ error() }}
+        </p>
+      } @else if (hasHistory() && history(); as history) {
+        @if (!hasItems()) {
+          <section class="order-history-empty">
+            <h2>{{ history.emptyTitle }}</h2>
+            <p>{{ history.emptyBody }}</p>
+            <a class="btn btn--primary" routerLink="/menu">Go to menu</a>
+          </section>
+        } @else {
+          <div class="order-history-list">
+            @for (item of history.items; track item.id) {
+              <article class="order-history-card">
+                <div class="order-history-card__top">
+                  <div>
+                    <h2>{{ item.orderNumberLabel }}</h2>
+                    <p>{{ item.dateLabel }}</p>
+                  </div>
+
+                  <span class="order-history-card__status">
+                    {{ item.statusLabel }}
+                  </span>
+                </div>
+
+                <p class="order-history-card__summary">{{ item.summaryLabel }}</p>
+
+                <div class="order-history-card__bottom">
+                  <strong>{{ item.totalLabel }}</strong>
+                  <a class="btn btn--ghost" routerLink="/menu">Reorder</a>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      }
+    </div>
+  </section>
+</app-forno-shell>

@@ -56,6 +56,7 @@ export class OrderTrackingMapper {
 
     return {
       orderId: order.orderId,
+      createdAt: order.createdAt,
       statusLabel: activeStep.label,
       statusBody: activeStep.body,
       etaMinutes: order.estimatedMinutes,
