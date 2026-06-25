@@ -1,0 +1,62 @@
+<app-forno-shell>
+  <section class="kitchen-board">
+    <header class="kitchen-board__header">
+      <div>
+        <h1>Kitchen board</h1>
+        <p>Manage active orders through each preparation stage.</p>
+      </div>
+
+      <button type="button" class="kitchen-board__refresh" (click)="load()">
+        Refresh
+      </button>
+    </header>
+
+    @if (loading()) {
+      <p class="kitchen-board__state">Loading board...</p>
+    } @else if (error()) {
+      <p class="kitchen-board__state kitchen-board__state--error">{{ error() }}</p>
+    } @else if (!hasOrders()) {
+      <div class="kitchen-board__empty">
+        <h2>{{ board()?.emptyTitle }}</h2>
+        <p>{{ board()?.emptyBody }}</p>
+      </div>
+    } @else {
+      <div class="kitchen-board__columns">
+        @for (column of columns(); track column.key) {
+          <section class="kitchen-column">
+            <header class="kitchen-column__header">
+              <h2>{{ column.title }}</h2>
+              <span>{{ column.orders.length }}</span>
+            </header>
+
+            <div class="kitchen-column__cards">
+              @for (order of column.orders; track order.id) {
+                <article class="kitchen-card">
+                  <div class="kitchen-card__top">
+                    <strong>{{ order.orderNumberLabel }}</strong>
+                    <span>{{ order.etaLabel }}</span>
+                  </div>
+
+                  <p class="kitchen-card__meta">{{ order.createdAtLabel }} · {{ order.fulfillmentLabel }}</p>
+                  <p class="kitchen-card__status">{{ order.statusLabel }}</p>
+                  <p class="kitchen-card__lines">{{ order.linesLabel }}</p>
+
+                  @if (order.canAdvance) {
+                    <button
+                      type="button"
+                      class="kitchen-card__action"
+                      [disabled]="isAdvancing(order.id)"
+                      (click)="advance(order.id, order.statusKey)"
+                    >
+                      {{ isAdvancing(order.id) ? 'Updating...' : order.nextActionLabel }}
+                    </button>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+  </section>
+</app-forno-shell>
