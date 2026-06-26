@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { CATALOG_PROVIDERS } from './contexts/catalog/catalog.providers';
 import { ORDERING_PROVIDERS } from './contexts/ordering/ordering.providers';
 import { CUSTOMER_PROVIDERS } from './contexts/customer/customer.providers';
+import { KITCHEN_PROVIDERS } from './contexts/kitchen/kitchen.providers';
 
 export const routes: Routes = [
   {
@@ -50,9 +51,10 @@ export const routes: Routes = [
   {
     path: 'kitchen',
     loadComponent: () =>
-      import('@pages/forno/forno-stub-page.component').then(
-        (c) => c.FornoStubPageComponent,
+      import('./contexts/kitchen/presentation/components/kitchen-order-board/kitchen-order-board.component').then(
+        (c) => c.KitchenOrderBoardComponent,
       ),
+    providers: [...KITCHEN_PROVIDERS],
   },
   {
     path: 'tracking/:orderId',

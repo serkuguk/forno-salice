@@ -1,62 +1,120 @@
-<app-forno-shell>
-  <section class="kitchen-board">
-    <header class="kitchen-board__header">
-      <div>
-        <h1>Kitchen board</h1>
-        <p>Manage active orders through each preparation stage.</p>
+<section class="kitchen-board">
+  <header class="kitchen-board__header">
+    <div class="kitchen-board__brand">
+      <a class="kitchen-board__logo" href="/home">
+        Forno <span>&amp;</span> Slice
+      </a>
+      <div class="kitchen-board__pill">Kitchen Board</div>
+    </div>
+
+    <div class="kitchen-board__summary">
+      <div class="kitchen-board__metric">
+        <div class="kitchen-board__metric-label">Active orders</div>
+        <div class="kitchen-board__metric-value">{{ activeOrders() }}</div>
       </div>
-
-      <button type="button" class="kitchen-board__refresh" (click)="load()">
-        Refresh
-      </button>
-    </header>
-
-    @if (loading()) {
-      <p class="kitchen-board__state">Loading board...</p>
-    } @else if (error()) {
-      <p class="kitchen-board__state kitchen-board__state--error">{{ error() }}</p>
-    } @else if (!hasOrders()) {
-      <div class="kitchen-board__empty">
-        <h2>{{ board()?.emptyTitle }}</h2>
-        <p>{{ board()?.emptyBody }}</p>
+      <div class="kitchen-board__clock">
+        <div class="kitchen-board__clock-time">{{ clockLabel() }}</div>
+        <div class="kitchen-board__clock-date">{{ dateLabel() }}</div>
       </div>
-    } @else {
-      <div class="kitchen-board__columns">
-        @for (column of columns(); track column.key) {
-          <section class="kitchen-column">
-            <header class="kitchen-column__header">
-              <h2>{{ column.title }}</h2>
-              <span>{{ column.orders.length }}</span>
-            </header>
+    </div>
+  </header>
 
-            <div class="kitchen-column__cards">
-              @for (order of column.orders; track order.id) {
-                <article class="kitchen-card">
+  @if (loading()) {
+    <div class="kitchen-board__state">Loading board...</div>
+  } @else if (error()) {
+    <div class="kitchen-board__state kitchen-board__state--error">{{ error() }}</div>
+  } @else if (!hasOrders()) {
+    <div class="kitchen-board__state">
+      <h2>{{ board()?.emptyTitle }}</h2>
+      <p>{{ board()?.emptyBody }}</p>
+    </div>
+  } @else {
+    <div class="kitchen-board__columns">
+      @for (column of columns(); track column.key) {
+        <section class="kitchen-column">
+          <header class="kitchen-column__header" [style.border-bottom-color]="column.accent">
+            <h2 [style.color]="column.accent">{{ column.title }}</h2>
+            <span class="kitchen-column__count" [style.background]="column.accent">
+              {{ column.orders.length }}
+            </span>
+          </header>
+
+          <div class="kitchen-column__cards">
+            @for (order of column.orders; track trackById($index, order)) {
+              @if (order.canAdvance) {
+                <button
+                  type="button"
+                  class="kitchen-card kitchen-card--actionable"
+                  [class.kitchen-card--ready]="order.isReady"
+                  [class.kitchen-card--advancing]="isAdvancing(order.id)"
+                  [disabled]="isAdvancing(order.id)"
+                  [attr.aria-label]="order.nextActionLabel"
+                  (click)="advance(order.id, order.statusKey)"
+                >
                   <div class="kitchen-card__top">
-                    <strong>{{ order.orderNumberLabel }}</strong>
-                    <span>{{ order.etaLabel }}</span>
+                    <strong>{{ order.displayId }}</strong>
+                    <span class="kitchen-card__station">Stn {{ order.station }}</span>
                   </div>
 
-                  <p class="kitchen-card__meta">{{ order.createdAtLabel }} · {{ order.fulfillmentLabel }}</p>
-                  <p class="kitchen-card__status">{{ order.statusLabel }}</p>
-                  <p class="kitchen-card__lines">{{ order.linesLabel }}</p>
+                  <div class="kitchen-card__items">
+                    @for (item of order.items; track item) {
+                      <div class="kitchen-card__item">
+                        <span class="kitchen-card__dot" [style.background]="column.accent"></span>
+                        <span>{{ item }}</span>
+                      </div>
+                    }
+                  </div>
 
-                  @if (order.canAdvance) {
-                    <button
-                      type="button"
-                      class="kitchen-card__action"
-                      [disabled]="isAdvancing(order.id)"
-                      (click)="advance(order.id, order.statusKey)"
-                    >
-                      {{ isAdvancing(order.id) ? 'Updating...' : order.nextActionLabel }}
-                    </button>
-                  }
+                  <div class="kitchen-card__footer">
+                    <span class="kitchen-card__footer-label">{{ order.footerLabel }}</span>
+                    <span class="kitchen-card__timer" [class]="timerClass(order.timerState)">
+                      {{ isAdvancing(order.id) ? 'Updating...' : order.timerLabel }}
+                    </span>
+                  </div>
+                </button>
+              } @else {
+                <article
+                  class="kitchen-card"
+                  [class.kitchen-card--ready]="order.isReady"
+                >
+                  <div class="kitchen-card__top">
+                    <strong>{{ order.displayId }}</strong>
+                    <span class="kitchen-card__station">Stn {{ order.station }}</span>
+                  </div>
+
+                  <div class="kitchen-card__items">
+                    @for (item of order.items; track item) {
+                      <div class="kitchen-card__item">
+                        <span class="kitchen-card__dot" [style.background]="column.accent"></span>
+                        <span>{{ item }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="kitchen-card__footer">
+                    <span class="kitchen-card__footer-label">{{ order.footerLabel }}</span>
+                    <span class="kitchen-card__timer" [class]="timerClass(order.timerState)">
+                      {{ order.timerLabel }}
+                    </span>
+                  </div>
                 </article>
               }
-            </div>
-          </section>
-        }
-      </div>
-    }
-  </section>
-</app-forno-shell>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <footer class="kitchen-board__footer">
+    <div class="kitchen-board__stations">
+      @for (station of stationSummary(); track station.station) {
+        <div class="kitchen-station">
+          <span class="kitchen-station__badge">Stn {{ station.station }}</span>
+          <span class="kitchen-station__count">{{ station.activeOrders }} active</span>
+        </div>
+      }
+    </div>
+    <div class="kitchen-board__footer-note">Internal view - Forno &amp; Slice kitchen</div>
+  </footer>
+</section>
